@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
-import HeroSearch from '../components/HeroSearch';
+import HeroSearch from '../components/HeroSection';
 import PopularDestinations from '../components/PopularDestinations';
 import AiFlightComparison from '../components/AiFlightComparison';
 import PromoBanner from '../components/PromoBanner';
