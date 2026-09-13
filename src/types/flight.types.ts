@@ -10,6 +10,18 @@ export interface Airline {
   logoUrl?: string;
 }
 
+export interface BaggagePolicy {
+  personalItem: boolean;
+  carryOn: boolean;
+  checkedBag: boolean;
+}
+
+export interface StopDetail {
+  airportIata: string;
+  airportCity: string;
+  layoverDuration: string;
+}
+
 export interface FlightItem {
   id: string;
   airline: Airline;
@@ -25,10 +37,13 @@ export interface FlightItem {
   durationMinutes: number;
   stopsCount: number;
   stopsFormatted: string; // "Directo" | "1 escala" | "2+ escalas"
+  stopsDetails?: StopDetail[];
   price: number;
   currency: string;
   tripTypeLabel: string; // "Ida y vuelta" | "Solo ida"
   timeOfDay: TimeOfDay;
+  badgeOffer?: string; // "Más barato" | "Recomendado" | "Más rápido" | "Oferta relámpago"
+  baggageIncluded?: BaggagePolicy;
 }
 
 export interface FlightFilterState {
@@ -48,3 +63,4 @@ export interface SearchQueryParams {
   passengers: number;
   travelClass: string;
 }
+
