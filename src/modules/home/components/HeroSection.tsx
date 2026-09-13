@@ -5,11 +5,11 @@ import {
   Typography,
   Stack,
 } from '@mui/material';
-import SearchForm from './SearchForm';
-import { HeroSearchValues } from '../../../types/home.types';
+import FlightSearchForm from '../../flights/components/FlightSearchForm';
+import { FlightSearchFormData } from '../../../types/flight.types';
 
 export interface HeroSectionProps {
-  onSearch?: (searchValues: HeroSearchValues) => void;
+  onSearch?: (searchValues: FlightSearchFormData) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
@@ -18,10 +18,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
       sx={{
         position: 'relative',
         bgcolor: 'secondary.main',
-        backgroundImage: 'linear-gradient(180deg, rgba(27, 42, 74, 0.75) 0%, rgba(27, 42, 74, 0.9) 100%), url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(27, 42, 74, 0.75) 0%, rgba(27, 42, 74, 0.9) 100%), url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        pt: { xs: 8, md: 10 },
+        pt: { xs: 6, md: 8 },
         pb: { xs: 8, md: 10 },
         px: { xs: 2, sm: 4, lg: 8 },
       }}
@@ -54,9 +55,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             </Typography>
           </Box>
 
-          {/* Aquí se inyecta el componente del Integrante 4 (Formulario de Búsqueda) */}
-          <SearchForm onSearch={onSearch} />
-
+          {/* Formulario de Búsqueda interactivo (US04) integrado en el Hero */}
+          <FlightSearchForm onSearchSubmit={onSearch} />
         </Stack>
       </Container>
     </Box>

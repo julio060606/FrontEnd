@@ -28,8 +28,8 @@ export interface HeaderProps {
 
 const navItems = [
   { label: 'Inicio', to: '/' },
+  { label: 'Buscar Vuelos', to: '/flights' },
   { label: 'Comparar Vuelos', to: '/compare' },
-  { label: 'Estado de Vuelos', to: '/status' },
   { label: 'Live Tracker', to: '/tracker' },
 ];
 
@@ -41,12 +41,12 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
   const closeDrawer = () => setMobileOpen(false);
 
   const linkStyles = ({ isActive }: { isActive: boolean }) => ({
-    color: isActive ? '#B30000' : '#8B0000',
+    color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
     fontWeight: isActive ? 700 : 500,
   });
 
   return (
-    <AppBar position="sticky" color="default" elevation={2} sx={{ bgcolor: '#FFFFFF' }}>
+    <AppBar position="sticky" color="default" elevation={1} sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -56,17 +56,16 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             px: { xs: 2, sm: 4, lg: 8 },
           }}
         >
-
-
           <Stack direction="row" spacing={{ xs: 2, lg: 5 }} alignItems="center">
+            {/* Logo de la plataforma */}
             <Box
               component={NavLink}
               to="/"
               sx={{
-                display:'flex' , 
+                display: 'flex',
                 alignItems: 'center',
-                gap: 1,
-                color: '#8B0000',
+                gap: 1.2,
+                color: 'primary.main',
                 textDecoration: 'none',
               }}
             >
@@ -77,7 +76,8 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                   display: { xs: 'none', sm: 'block' },
                   fontSize: { xs: '1.15rem', md: '1.35rem' },
                   fontWeight: 800,
-                  color: '#8B0000',
+                  color: 'primary.main',
+                  letterSpacing: '-0.02em',
                 }}
               >
                 FlightTracker
@@ -85,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             </Box>
 
             {!isMobile && (
-              <Stack direction="row" spacing={{ md: 2, lg: 3 }}>
+              <Stack direction="row" spacing={{ md: 2, lg: 3.5 }}>
                 {navItems.map((item) => (
                   <Box
                     key={item.label}
@@ -95,8 +95,9 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                     sx={{
                       py: 1,
                       textDecoration: 'none',
-                      fontSize: { md: '0.8rem', lg: '0.875rem' },
-                      '&:hover': { color: '#B30000' },
+                      fontSize: { md: '0.85rem', lg: '0.9rem' },
+                      transition: 'color 0.2s ease',
+                      '&:hover': { color: 'primary.main' },
                     }}
                   >
                     {item.label}
@@ -106,18 +107,19 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             )}
           </Stack>
 
-<Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <Button
               component={NavLink}
               to="/login"
               variant="text"
               onClick={onLoginClick}
               sx={{
-                display: 'inline-flex', // Siempre visible
-                color: '#8B0000',
+                display: 'inline-flex',
+                color: 'primary.main',
                 fontWeight: 600,
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }, // Ajuste opcional para pantallas muy chicas
-                '&:hover': { color: '#B30000', bgcolor: 'rgba(139, 0, 0, 0.08)' },
+                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                textTransform: 'none',
+                '&:hover': { color: 'primary.dark', bgcolor: 'soft.primary' },
               }}
             >
               Iniciar Sesión
@@ -126,23 +128,27 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
               component={NavLink}
               to="/register"
               variant="contained"
+              color="primary"
               sx={{
-                display: 'inline-flex', // Siempre visible
-                bgcolor: '#8B0000',
+                display: 'inline-flex',
                 color: '#FFFFFF',
                 fontWeight: 700,
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }, // Ajuste opcional para pantallas muy chicas
-                '&:hover': { bgcolor: '#660000' },
+                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                textTransform: 'none',
+                borderRadius: 1.5,
+                boxShadow: '0 2px 8px rgba(160, 27, 45, 0.2)',
+                '&:hover': { bgcolor: 'primary.dark' },
               }}
             >
               Registrarse
             </Button>
+
             {isMobile && (
               <IconButton
                 edge="end"
                 aria-label="Abrir menú"
                 onClick={() => setMobileOpen(true)}
-                sx={{ color: '#8B0000' }}
+                sx={{ color: 'primary.main' }}
               >
                 <MenuIcon />
               </IconButton>
@@ -151,19 +157,21 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
         </Toolbar>
       </Container>
 
-
-
+      {/* Drawer Móvil */}
       <Drawer
         anchor="right"
         open={mobileOpen}
         onClose={closeDrawer}
         ModalProps={{ keepMounted: true }}
-        PaperProps={{ sx: { width: { xs: 'min(280px, 88vw)', sm: 320 }, p: 2 } }}
+        PaperProps={{ sx: { width: { xs: 'min(280px, 88vw)', sm: 320 }, p: 2.5 } }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ color: '#8B0000', fontWeight: 800 }}>
-            FlightTracker
-          </Typography>
+          <Box display="flex" alignItems="center" gap={1} color="primary.main">
+            <FlightTakeoffIcon />
+            <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>
+              FlightTracker
+            </Typography>
+          </Box>
           <IconButton aria-label="Cerrar menú" onClick={closeDrawer}>
             <CloseIcon />
           </IconButton>
@@ -177,9 +185,9 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                 to={item.to}
                 onClick={closeDrawer}
                 sx={{
-                  borderRadius: 0,
-                  color: '#8B0000',
-                  '&.active': { bgcolor: 'rgba(139, 0, 0, 0.1)', color: '#B30000' },
+                  borderRadius: 2,
+                  color: 'text.primary',
+                  '&.active': { bgcolor: 'soft.primary', color: 'primary.main', fontWeight: 700 },
                 }}
               >
                 <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 600 }} />
@@ -188,14 +196,15 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
           ))}
         </List>
 
-        <Stack spacing={1} sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Stack spacing={1.5} sx={{ mt: 3, pt: 2.5, borderTop: 1, borderColor: 'divider' }}>
           <Button
             component={NavLink}
             to="/login"
-            variant="text"
+            variant="outlined"
+            color="primary"
             fullWidth
             onClick={closeDrawer}
-            sx={{ color: '#8B0000', fontWeight: 700 }}
+            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5 }}
           >
             Iniciar Sesión
           </Button>
@@ -203,9 +212,10 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             component={NavLink}
             to="/register"
             variant="contained"
+            color="primary"
             fullWidth
             onClick={closeDrawer}
-            sx={{ bgcolor: '#8B0000', color: '#FFFFFF', fontWeight: 700, '&:hover': { bgcolor: '#660000' } }}
+            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5 }}
           >
             Registrarse
           </Button>

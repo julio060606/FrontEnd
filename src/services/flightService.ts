@@ -11,15 +11,24 @@ const simulateDelay = <T>(data: T, ms: number = 300): Promise<T> => {
   return new Promise((resolve) => setTimeout(() => resolve(data), ms));
 };
 
+let activeSearchParams: SearchQueryParams = { ...MOCK_CURRENT_SEARCH };
+
 export const flightService = {
   /**
    * Obtiene el resumen de la búsqueda actual
    */
   async getCurrentSearchParams(): Promise<SearchQueryParams> {
     if (USE_MOCKS) {
-      return simulateDelay(MOCK_CURRENT_SEARCH, 100);
+      return simulateDelay(activeSearchParams, 100);
     }
-    return MOCK_CURRENT_SEARCH;
+    return activeSearchParams;
+  },
+
+  /**
+   * Actualiza los parámetros de búsqueda activos en memoria/mock
+   */
+  setCurrentSearchParams(params: SearchQueryParams): void {
+    activeSearchParams = { ...params };
   },
 
   /**

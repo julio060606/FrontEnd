@@ -8,6 +8,9 @@ export interface Airport {
 
 export type TravelClass = 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST_CLASS';
 export type TripType = 'ONE_WAY' | 'ROUND_TRIP';
+export type FlightStopType = 'DIRECT' | 'ONE_STOP' | 'TWO_PLUS_STOPS';
+export type TimeOfDay = 'MORNING' | 'AFTERNOON' | 'NIGHT';
+export type SortOption = 'PRICE_ASC' | 'DURATION_ASC' | 'BEST';
 
 export interface FlightSearchFormData {
   tripType: TripType;
@@ -19,15 +22,19 @@ export interface FlightSearchFormData {
   travelClass: TravelClass;
 }
 
+/**
+ * Interfaz unificada de Aerolínea para soportar tanto identificadores numéricos/alfanuméricos
+ * como los badges y códigos requeridos por los módulos de US04, US05 y US06.
+ */
 export interface Airline {
-  id: number;
+  id: string | number;
   name: string;
-  iataCode: string;
+  code?: string;
+  iataCode?: string;
+  colorBadge?: 'success' | 'warning' | 'primary' | 'error' | 'info';
   logoUrl?: string;
 }
 
-export interface Flight {
-  flightId: string;
 export interface BaggagePolicy {
   personalItem: boolean;
   carryOn: boolean;
@@ -40,10 +47,8 @@ export interface StopDetail {
   layoverDuration: string;
 }
 
-export interface FlightItem {
-  id: string;
-  airline: Airline;
-  cabinClass: string;
+export interface Flight {
+  flightId: string;
   flightNumber: string;
   airline: Airline;
   origin: Pick<Airport, 'iataCode' | 'city'>;
@@ -56,6 +61,22 @@ export interface FlightItem {
   currency: string;
   availableSeats: number;
   status: 'SCHEDULED' | 'BOARDING' | 'DELAYED' | 'CANCELLED';
+}
+
+export interface FlightItem {
+  id: string;
+  airline: Airline;
+  cabinClass: string;
+  flightNumber: string;
+  originIata: string;
+  originCity: string;
+  destinationIata: string;
+  destinationCity: string;
+  departureTime: string; // "14:20"
+  arrivalTime: string;   // "15:40"
+  durationFormatted: string; // "1h 20m"
+  durationMinutes: number;
+  stopsCount: number;
   stopsFormatted: string; // "Directo" | "1 escala" | "2+ escalas"
   stopsDetails?: StopDetail[];
   price: number;
@@ -82,5 +103,5 @@ export interface SearchQueryParams {
   returnDate?: string;
   passengers: number;
   travelClass: string;
+  tripType?: TripType;
 }
-

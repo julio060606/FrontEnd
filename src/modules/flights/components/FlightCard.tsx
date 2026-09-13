@@ -24,7 +24,7 @@ export const FlightCard: React.FC<FlightCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Mapeo semántico de colores para el badge de la aerolínea
-  const getAirlineBadgeColor = (badgeType: string) => {
+  const getAirlineBadgeColor = (badgeType?: string) => {
     switch (badgeType) {
       case 'success':
         return '#10B981';

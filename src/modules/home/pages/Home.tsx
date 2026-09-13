@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
-import HeroSearch from '../components/HeroSection';
+import HeroSection from '../components/HeroSection';
 import PopularDestinations from '../components/PopularDestinations';
 import AiFlightComparison from '../components/AiFlightComparison';
 import PromoBanner from '../components/PromoBanner';
 import { homeService } from '../../../services/homeService';
-import { PopularDestination, AiComparisonScenario, HeroSearchValues } from '../../../types/home.types';
-
+import { flightService } from '../../../services/flightService';
+import { PopularDestination, AiComparisonScenario } from '../../../types/home.types';
 import { searchFlightsMock } from '../../flights/services/flight.service.mock';
-import { Flight, FlightSearchFormData } from '../../../types/flight.types';
+import { FlightSearchFormData } from '../../../types/flight.types';
 
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
   const [destinations, setDestinations] = useState<PopularDestination[]>([]);
   const [aiScenario, setAiScenario] = useState<AiComparisonScenario | undefined>(undefined);
   const [isLoadingDestinations, setIsLoadingDestinations] = useState<boolean>(true);
-  const [searchResults, setSearchResults] = useState<Flight[]>([]);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -48,77 +48,87 @@ export const Home: React.FC = () => {
     };
   }, []);
 
-  const handleSearch = async (searchValues: HeroSearchValues) => {
-    console.log('Ejecutando búsqueda con parámetros:', searchValues);
-    try {
-      setIsSearching(true);
-      
-      // Adaptar HeroSearchValues a FlightSearchFormData para que el mock lo entienda
-      const mockData: FlightSearchFormData = {
-        tripType: searchValues.tripType,
-        origin: { 
-          iataCode: searchValues.origin.slice(-4, -1), 
-          city: searchValues.origin.split(' (')[0], 
-          id: 1, name: '', country: 'Perú' 
-        },
-        destination: { 
-          iataCode: searchValues.destination.slice(-4, -1), 
-          city: searchValues.destination.split(' (')[0], 
-          id: 2, name: '', country: 'Perú' 
-        },
-        departureDate: new Date(),
-        returnDate: searchValues.returnDate ? new Date() : null,
-        passengers: searchValues.passengers as number || 1,
-        travelClass: searchValues.travelClass as any,
-      };
+  const handleSearch = async (formData: FlightSearchFormData) => {
+    if (!formData.origin || !formData.destination) return;
 
-      const vuelosEncontrados = await searchFlightsMock(mockData);
-      setSearchResults(vuelosEncontrados);
-      console.log("✈️ Vuelos encontrados de forma simulada (Mock):", vuelosEncontrados);
+    try {
+      const depDateFormatted = formData.departureDate
+        ? formData.departureDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
+        : '15 Sep';
+
+      const retDateFormatted = formData.returnDate
+        ? formData.returnDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
+        : undefined;
+
+      // Actualizar los parámetros en el servicio de vuelos
+      flightService.setCurrentSearchParams({
+        origin: formData.origin.city,
+        originIata: formData.origin.iataCode,
+        destination: formData.destination.city,
+        destinationIata: formData.destination.iataCode,
+        departureDate: depDateFormatted,
+        returnDate: formData.tripType === 'ROUND_TRIP' ? retDateFormatted : undefined,
+        passengers: formData.passengers,
+        travelClass: formData.travelClass === 'ECONOMY' ? 'Económica' : formData.travelClass,
+        tripType: formData.tripType,
+      });
+
+      // Ejecución del mock de búsqueda de US04
+      const vuelosSimulados = await searchFlightsMock(formData);
+      console.log('✈️ Vuelos encontrados de forma simulada (Mock US04):', vuelosSimulados);
+
+      // Redirección a la pantalla de resultados
+      navigate('/flights');
     } catch (error) {
-      console.error("Error buscando vuelos simulados:", error);
-    } finally {
-      setIsSearching(false);
+      console.error('Error al procesar búsqueda de vuelos:', error);
     }
   };
 
   const handleDestinationClick = (destination: PopularDestination) => {
-    console.log('Destino seleccionado:', destination.city);
+    console.log('Destino popular seleccionado:', destination.city);
+    flightService.setCurrentSearchParams({
+      origin: 'Lima',
+      originIata: 'LIM',
+      destination: destination.city,
+      destinationIata: destination.id.replace('dest-', '').toUpperCase(),
+      departureDate: '15 Sep',
+      returnDate: '20 Sep',
+      passengers: 1,
+      travelClass: 'Económica',
+      tripType: 'ROUND_TRIP',
+    });
+    navigate('/flights');
   };
 
-  const handleCompareClick = (scenario: AiComparisonScenario) => {
-    console.log('Comparando vuelos asistidos por IA:', scenario);
-  };
-
-  const handleLoginClick = () => {
-    console.log('Abrir modal de login');
+  const handleCompareClick = (scenario?: AiComparisonScenario) => {
+    console.log('Comparando vuelos recomendados:', scenario);
+    navigate('/compare');
   };
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
-      {/* Hero con Buscador Integrado */}
+      {/* 1. Hero con Buscador Integrado (US01 + US04) */}
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSearch onSearch={handleSearch} />
+        <HeroSection onSearch={handleSearch} />
 
-        {/* 3. Sección A: Destinos Populares */}
+        {/* 2. Destinos Populares en Perú */}
         <PopularDestinations
           destinations={destinations}
           isLoading={isLoadingDestinations}
           onDestinationClick={handleDestinationClick}
         />
 
-        {/* 4. Sección B: Recomendación y Comparador Asistido por IA */}
+        {/* 3. Escenario y Comparador Asistido por IA */}
         <AiFlightComparison
           scenario={aiScenario}
           onCompareClick={handleCompareClick}
         />
 
-        {/* 5. Sección C: Banner Promocional de Alertas */}
+        {/* 4. Banner Promocional de Alertas y Monitoreo */}
         <PromoBanner
-          onBannerActionClick={() => console.log('Activar alertas')}
+          onBannerActionClick={() => navigate('/tracker')}
         />
       </Box>
-
     </Box>
   );
 };
