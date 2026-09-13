@@ -28,6 +28,22 @@ export interface Airline {
 
 export interface Flight {
   flightId: string;
+export interface BaggagePolicy {
+  personalItem: boolean;
+  carryOn: boolean;
+  checkedBag: boolean;
+}
+
+export interface StopDetail {
+  airportIata: string;
+  airportCity: string;
+  layoverDuration: string;
+}
+
+export interface FlightItem {
+  id: string;
+  airline: Airline;
+  cabinClass: string;
   flightNumber: string;
   airline: Airline;
   origin: Pick<Airport, 'iataCode' | 'city'>;
@@ -40,4 +56,31 @@ export interface Flight {
   currency: string;
   availableSeats: number;
   status: 'SCHEDULED' | 'BOARDING' | 'DELAYED' | 'CANCELLED';
+  stopsFormatted: string; // "Directo" | "1 escala" | "2+ escalas"
+  stopsDetails?: StopDetail[];
+  price: number;
+  currency: string;
+  tripTypeLabel: string; // "Ida y vuelta" | "Solo ida"
+  timeOfDay: TimeOfDay;
+  badgeOffer?: string; // "Más barato" | "Recomendado" | "Más rápido" | "Oferta relámpago"
+  baggageIncluded?: BaggagePolicy;
 }
+
+export interface FlightFilterState {
+  stops: number[]; // [0, 1, 2]
+  priceRange: [number, number]; // [80, 500]
+  airlines: string[]; // airline names / ids
+  departureTimes: TimeOfDay[]; // ['MORNING', 'AFTERNOON', 'NIGHT']
+}
+
+export interface SearchQueryParams {
+  origin: string;
+  originIata: string;
+  destination: string;
+  destinationIata: string;
+  departureDate: string;
+  returnDate?: string;
+  passengers: number;
+  travelClass: string;
+}
+

@@ -45,7 +45,12 @@ export const flightService = {
         }
 
         if (filters.airlines && filters.airlines.length > 0) {
-          results = results.filter((f) => filters.airlines!.includes(f.airline.name));
+          results = results.filter((f) =>
+            filters.airlines!.some((selectedAirline) =>
+              f.airline.name.toLowerCase().includes(selectedAirline.toLowerCase()) ||
+              selectedAirline.toLowerCase().includes(f.airline.name.toLowerCase())
+            )
+          );
         }
 
         if (filters.departureTimes && filters.departureTimes.length > 0) {
@@ -58,6 +63,13 @@ export const flightService = {
         results.sort((a, b) => a.price - b.price);
       } else if (sortBy === 'DURATION_ASC') {
         results.sort((a, b) => a.durationMinutes - b.durationMinutes);
+      } else if (sortBy === 'BEST') {
+        // Mejor balance: menor precio, menor duración y menos escalas
+        results.sort((a, b) => {
+          const scoreA = a.price * 0.6 + a.durationMinutes * 0.3 + a.stopsCount * 50;
+          const scoreB = b.price * 0.6 + b.durationMinutes * 0.3 + b.stopsCount * 50;
+          return scoreA - scoreB;
+        });
       }
 
       return simulateDelay(results, 250);
