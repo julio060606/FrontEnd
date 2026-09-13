@@ -13,7 +13,7 @@ import {
   Skeleton,
   Chip,
 } from '@mui/material';
-import SearchSummaryBar from '../components/SearchSummaryBar';
+import { SearchSummaryBar } from '../components/SearchSummaryBar';
 import FilterSidebar from '../components/FilterSidebar';
 import FlightCard from '../components/FlightCard';
 import { flightService } from '../../../services/flightService';

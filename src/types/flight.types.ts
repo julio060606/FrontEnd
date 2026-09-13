@@ -1,15 +1,33 @@
-export type FlightStopType = 'DIRECT' | 'ONE_STOP' | 'TWO_PLUS_STOPS';
-export type TimeOfDay = 'MORNING' | 'AFTERNOON' | 'NIGHT';
-export type SortOption = 'PRICE_ASC' | 'DURATION_ASC' | 'BEST';
+export interface Airport {
+  id: number;
+  iataCode: string;
+  name: string;
+  city: string;
+  country: string;
+}
+
+export type TravelClass = 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST_CLASS';
+export type TripType = 'ONE_WAY' | 'ROUND_TRIP';
+
+export interface FlightSearchFormData {
+  tripType: TripType;
+  origin: Airport | null;
+  destination: Airport | null;
+  departureDate: Date | null;
+  returnDate?: Date | null;
+  passengers: number;
+  travelClass: TravelClass;
+}
 
 export interface Airline {
-  id: string;
+  id: number;
   name: string;
-  code: string;
-  colorBadge: 'success' | 'warning' | 'primary' | 'error' | 'info';
+  iataCode: string;
   logoUrl?: string;
 }
 
+export interface Flight {
+  flightId: string;
 export interface BaggagePolicy {
   personalItem: boolean;
   carryOn: boolean;
@@ -27,15 +45,17 @@ export interface FlightItem {
   airline: Airline;
   cabinClass: string;
   flightNumber: string;
-  originIata: string;
-  originCity: string;
-  destinationIata: string;
-  destinationCity: string;
-  departureTime: string; // "14:20"
-  arrivalTime: string;   // "15:40"
-  durationFormatted: string; // "1h 20m"
+  airline: Airline;
+  origin: Pick<Airport, 'iataCode' | 'city'>;
+  destination: Pick<Airport, 'iataCode' | 'city'>;
+  departureTime: string;
+  arrivalTime: string;
   durationMinutes: number;
   stopsCount: number;
+  basePrice: number;
+  currency: string;
+  availableSeats: number;
+  status: 'SCHEDULED' | 'BOARDING' | 'DELAYED' | 'CANCELLED';
   stopsFormatted: string; // "Directo" | "1 escala" | "2+ escalas"
   stopsDetails?: StopDetail[];
   price: number;

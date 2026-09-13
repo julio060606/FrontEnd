@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
-import HeroSection from '../components/HeroSection';
+import HeroSearch from '../components/HeroSection';
 import PopularDestinations from '../components/PopularDestinations';
 import AiFlightComparison from '../components/AiFlightComparison';
 import PromoBanner from '../components/PromoBanner';
 import { homeService } from '../../../services/homeService';
 import { PopularDestination, AiComparisonScenario, HeroSearchValues } from '../../../types/home.types';
 
+import { searchFlightsMock } from '../../flights/services/flight.service.mock';
+import { Flight, FlightSearchFormData } from '../../../types/flight.types';
+
 export const Home: React.FC = () => {
   const [destinations, setDestinations] = useState<PopularDestination[]>([]);
   const [aiScenario, setAiScenario] = useState<AiComparisonScenario | undefined>(undefined);
   const [isLoadingDestinations, setIsLoadingDestinations] = useState<boolean>(true);
+  const [searchResults, setSearchResults] = useState<Flight[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -43,9 +48,38 @@ export const Home: React.FC = () => {
     };
   }, []);
 
-  const handleSearch = (searchValues: HeroSearchValues) => {
+  const handleSearch = async (searchValues: HeroSearchValues) => {
     console.log('Ejecutando búsqueda con parámetros:', searchValues);
-    // Redirección o actualización de estado para el buscador del Sprint 1
+    try {
+      setIsSearching(true);
+      
+      // Adaptar HeroSearchValues a FlightSearchFormData para que el mock lo entienda
+      const mockData: FlightSearchFormData = {
+        tripType: searchValues.tripType,
+        origin: { 
+          iataCode: searchValues.origin.slice(-4, -1), 
+          city: searchValues.origin.split(' (')[0], 
+          id: 1, name: '', country: 'Perú' 
+        },
+        destination: { 
+          iataCode: searchValues.destination.slice(-4, -1), 
+          city: searchValues.destination.split(' (')[0], 
+          id: 2, name: '', country: 'Perú' 
+        },
+        departureDate: new Date(),
+        returnDate: searchValues.returnDate ? new Date() : null,
+        passengers: searchValues.passengers as number || 1,
+        travelClass: searchValues.travelClass as any,
+      };
+
+      const vuelosEncontrados = await searchFlightsMock(mockData);
+      setSearchResults(vuelosEncontrados);
+      console.log("✈️ Vuelos encontrados de forma simulada (Mock):", vuelosEncontrados);
+    } catch (error) {
+      console.error("Error buscando vuelos simulados:", error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleDestinationClick = (destination: PopularDestination) => {
@@ -64,7 +98,7 @@ export const Home: React.FC = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       {/* Hero con Buscador Integrado */}
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSection onSearch={handleSearch} />
+        <HeroSearch onSearch={handleSearch} />
 
         {/* 3. Sección A: Destinos Populares */}
         <PopularDestinations
