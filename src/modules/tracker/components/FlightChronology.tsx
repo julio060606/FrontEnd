@@ -17,81 +17,99 @@ export const FlightChronology: React.FC<FlightChronologyProps> = ({ events }) =>
       elevation={0}
       sx={{
         width: '100%',
-        p: { xs: 2.5, sm: 3.5, md: 4 },
-        bgcolor: 'background.paper',
-        borderRadius: 4,
-        border: 1,
-        borderColor: 'divider',
+        p: { xs: 3, sm: 4 },
+        bgcolor: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1px solid #E2DBD7',
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <Stack spacing={3}>
-        <Typography
-          variant="h3"
-          sx={{
-            color: 'secondary.main',
-            fontWeight: 800,
-            fontSize: { xs: '1.1rem', md: '1.2rem' },
-          }}
-        >
-          Historial y Cronología del Vuelo
-        </Typography>
+      <Typography
+        sx={{
+          color: '#1B2A4A',
+          fontWeight: 800,
+          fontSize: '18px',
+          fontFamily: 'Inter',
+          mb: 3,
+        }}
+      >
+        Historial y Cronología del Vuelo
+      </Typography>
 
-        {/* Vertical Timeline List */}
-        <Box sx={{ width: '100%' }}>
-          {events.map((event, index) => {
-            const isLast = index === events.length - 1;
-            const isCurrent = event.status === 'current';
-            const isUpcoming = event.status === 'upcoming';
+      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+        {events.map((event, index) => {
+          const isLast = index === events.length - 1;
+          const isCurrent = event.status === 'current';
+          const isUpcoming = event.status === 'upcoming';
 
-            return (
-              <Stack
-                key={event.id}
-                direction="row"
-                alignItems="flex-start"
-                sx={{ position: 'relative', pb: isLast ? 0 : 2.5 }}
-              >
-                {/* 1. Columna Hora */}
-                <Box sx={{ width: { xs: 70, sm: 90 }, flexShrink: 0, pt: 0.25 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: isCurrent ? 700 : 600,
-                      color: isCurrent
-                        ? 'success.main'
-                        : isUpcoming
-                        ? 'text.disabled'
-                        : 'text.secondary',
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {event.time}
-                  </Typography>
-                </Box>
-
-                {/* 2. Columna Timeline Node & Connector Line */}
-                <Box
+          return (
+            <Box
+              key={event.id}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                position: 'relative',
+              }}
+            >
+              {/* 1. Columna Hora */}
+              <Box sx={{ width: { xs: 65, sm: 90 }, flexShrink: 0, pt: '2px' }}>
+                <Typography
                   sx={{
-                    width: 32,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                    position: 'relative',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: isCurrent ? 700 : isUpcoming ? 500 : 600,
+                    color: isCurrent ? '#10B981' : isUpcoming ? '#9E9490' : '#6B615E',
                   }}
                 >
-                  {/* Bullet Node */}
+                  {event.time}
+                </Typography>
+              </Box>
+
+              {/* 2. Columna Timeline (Línea Continua y Nodo Centrado) */}
+              <Box
+                sx={{
+                  width: 32,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  position: 'relative',
+                  alignSelf: 'stretch',
+                }}
+              >
+                {/* Línea vertical continua */}
+                {!isLast && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 14,
+                      bottom: 0,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '2px',
+                      bgcolor: '#E2DBD7',
+                      zIndex: 1,
+                    }}
+                  />
+                )}
+
+                {/* Nodo / Bullet */}
+                <Box
+                  sx={{
+                    mt: isCurrent ? '2px' : '4px',
+                    zIndex: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
                   {isCurrent ? (
                     <Box
                       sx={{
                         width: 14,
                         height: 14,
-                        bgcolor: 'success.main',
+                        bgcolor: '#10B981',
                         borderRadius: '50%',
-                        border: 3,
-                        borderColor: 'soft.success',
-                        boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.3)',
-                        zIndex: 2,
+                        boxShadow: '0 0 0 4px #DCFCE7',
                       }}
                     />
                   ) : isUpcoming ? (
@@ -99,10 +117,8 @@ export const FlightChronology: React.FC<FlightChronologyProps> = ({ events }) =>
                       sx={{
                         width: 10,
                         height: 10,
-                        bgcolor: 'text.disabled',
+                        bgcolor: '#D0C7C2',
                         borderRadius: '50%',
-                        mt: 0.5,
-                        zIndex: 2,
                       }}
                     />
                   ) : (
@@ -110,63 +126,50 @@ export const FlightChronology: React.FC<FlightChronologyProps> = ({ events }) =>
                       sx={{
                         width: 10,
                         height: 10,
-                        bgcolor: 'primary.main',
+                        bgcolor: '#A01B2D',
                         borderRadius: '50%',
-                        mt: 0.5,
-                        zIndex: 2,
-                      }}
-                    />
-                  )}
-
-                  {/* Connecting Line */}
-                  {!isLast && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 14,
-                        bottom: -10,
-                        width: 2,
-                        bgcolor: 'divider',
-                        zIndex: 1,
                       }}
                     />
                   )}
                 </Box>
+              </Box>
 
-                {/* 3. Columna Descripción del Evento */}
-                <Box sx={{ flex: 1, pl: 1, pt: 0.1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: isCurrent ? 700 : 600,
-                      color: isCurrent
-                        ? 'success.main'
-                        : isUpcoming
-                        ? 'text.disabled'
-                        : 'secondary.main',
-                      fontSize: '0.925rem',
-                    }}
-                  >
-                    {event.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: isUpcoming ? 'text.disabled' : 'text.secondary',
-                      fontSize: '0.8125rem',
-                      display: 'block',
-                      mt: 0.25,
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    {event.description}
-                  </Typography>
-                </Box>
-              </Stack>
-            );
-          })}
-        </Box>
-      </Stack>
+              {/* 3. Columna Descripción del Evento */}
+              <Box
+                sx={{
+                  flex: 1,
+                  pl: 2,
+                  pb: isLast ? 0 : 3,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: isCurrent ? 700 : isUpcoming ? 500 : 600,
+                    color: isCurrent ? '#10B981' : isUpcoming ? '#9E9490' : '#1B2A4A',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {event.title}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: '13px',
+                    fontFamily: 'Inter',
+                    fontWeight: 400,
+                    color: isUpcoming ? '#9E9490' : '#6B615E',
+                    lineHeight: 1.45,
+                    mt: 0.5,
+                  }}
+                >
+                  {event.description}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        })}
+      </Box>
     </Paper>
   );
 };

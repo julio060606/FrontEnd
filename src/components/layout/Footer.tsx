@@ -50,7 +50,7 @@ export const Footer: React.FC = () => {
     <Box
       component="footer"
       sx={{
-        bgcolor: '#0A4D68',
+        bgcolor: '#1B2A4A',
         color: '#FFFFFF',
         pt: { xs: 6, md: 8 },
         pb: 3,

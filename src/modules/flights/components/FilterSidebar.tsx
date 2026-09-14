@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -22,16 +22,25 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onFiltersChange,
   initialFilters,
 }) => {
-  const [stops, setStops] = useState<number[]>(initialFilters?.stops ?? [0]);
+  const [stops, setStops] = useState<number[]>(initialFilters?.stops ?? []);
   const [priceRange, setPriceRange] = useState<[number, number]>(
     initialFilters?.priceRange ?? [80, 500]
   );
   const [airlines, setAirlines] = useState<string[]>(
-    initialFilters?.airlines ?? ['LATAM', 'Sky Airline']
+    initialFilters?.airlines ?? []
   );
   const [departureTimes, setDepartureTimes] = useState<TimeOfDay[]>(
-    initialFilters?.departureTimes ?? ['AFTERNOON']
+    initialFilters?.departureTimes ?? []
   );
+
+  useEffect(() => {
+    if (initialFilters) {
+      if (initialFilters.stops !== undefined) setStops(initialFilters.stops);
+      if (initialFilters.priceRange !== undefined) setPriceRange(initialFilters.priceRange);
+      if (initialFilters.airlines !== undefined) setAirlines(initialFilters.airlines);
+      if (initialFilters.departureTimes !== undefined) setDepartureTimes(initialFilters.departureTimes);
+    }
+  }, [initialFilters]);
 
   const notifyChange = (updated: Partial<FlightFilterState>) => {
     onFiltersChange?.({

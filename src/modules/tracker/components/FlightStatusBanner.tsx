@@ -18,10 +18,9 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
         width: '100%',
         px: { xs: 2.5, sm: 3 },
         py: 2,
-        bgcolor: 'soft.primary',
-        borderRadius: 3,
-        border: 1,
-        borderColor: 'primary.light',
+        bgcolor: '#FEF1EF',
+        borderRadius: '12px',
+        border: '1px solid #FDE8EC',
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
@@ -34,12 +33,12 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
         direction="row"
         alignItems="center"
         spacing={{ xs: 1.5, sm: 2 }}
-        divider={<Divider orientation="vertical" flexItem sx={{ borderColor: 'primary.light', my: 0.5 }} />}
+        divider={<Divider orientation="vertical" flexItem sx={{ borderColor: '#FDE8EC', my: 0.5 }} />}
       >
         <Typography
           variant="h3"
           sx={{
-            color: 'primary.main',
+            color: '#A01B2D',
             fontWeight: 800,
             fontSize: { xs: '1rem', sm: '1.125rem' },
           }}
@@ -50,7 +49,7 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
         <Typography
           variant="body1"
           sx={{
-            color: 'primary.dark',
+            color: '#801524',
             fontWeight: 600,
             fontSize: { xs: '0.8125rem', sm: '0.875rem' },
           }}
@@ -66,7 +65,7 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
           sx={{
             px: 1.5,
             py: 0.75,
-            bgcolor: 'soft.success',
+            bgcolor: '#DCFCE7',
             borderRadius: '100px',
             display: 'inline-flex',
             alignItems: 'center',
@@ -77,15 +76,14 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
             sx={{
               width: 8,
               height: 8,
-              bgcolor: 'success.dark',
+              bgcolor: '#15803D',
               borderRadius: '50%',
-              boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.2)',
             }}
           />
           <Typography
             variant="caption"
             sx={{
-              color: 'success.dark',
+              color: '#15803D',
               fontWeight: 700,
               fontSize: '0.8125rem',
             }}
@@ -99,10 +97,8 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
           sx={{
             px: 1.5,
             py: 0.75,
-            bgcolor: 'background.paper',
+            bgcolor: '#FDE8EC',
             borderRadius: '100px',
-            border: 1,
-            borderColor: 'primary.light',
             display: 'inline-flex',
             alignItems: 'center',
           }}
@@ -110,7 +106,7 @@ export const FlightStatusBanner: React.FC<FlightStatusBannerProps> = ({ flight }
           <Typography
             variant="caption"
             sx={{
-              color: 'primary.main',
+              color: '#A01B2D',
               fontWeight: 700,
               fontSize: '0.8125rem',
             }}

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Box,
   Typography,
@@ -14,10 +14,10 @@ import {
   InputAdornment,
   Alert,
   CircularProgress,
-} from '@mui/material';
-import { loginSchema, LoginFormValues } from '../../../validations/auth.schema';
-import { authService } from '../../../services/authService';
-import { AuthResponse } from '../../../types/auth.types';
+} from "@mui/material";
+import { loginSchema, LoginFormValues } from "../../../validations/auth.schema";
+import { authService } from "../../../services/authService";
+import { AuthResponse } from "../../../types/auth.types";
 
 export interface LoginFormProps {
   onSuccess?: (authData: AuthResponse) => void;
@@ -38,11 +38,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       rememberMe: false,
     },
-    mode: 'onTouched',
+    mode: "onTouched",
   });
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -54,24 +54,39 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       if (err instanceof Error) {
         setErrorMessage(err.message);
       } else {
-        setErrorMessage('Ocurrió un error inesperado al iniciar sesión.');
+        setErrorMessage("Ocurrió un error inesperado al iniciar sesión.");
       }
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ width: '100%' }}>
-      <Stack spacing={2.5}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      sx={{ width: "100%" }}
+    >
+      <Stack spacing={1.75}>
         {/* Error Alert Banner */}
         {errorMessage && (
-          <Alert severity="error" sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}>
+          <Alert
+            severity="error"
+            sx={{ borderRadius: 1.5, fontSize: "0.85rem" }}
+          >
             {errorMessage}
           </Alert>
         )}
 
         {/* 1. Campo Correo Electrónico */}
         <Stack spacing={0.75}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 600,
+              fontSize: "0.8125rem",
+            }}
+          >
             Correo electrónico
           </Typography>
           <Controller
@@ -87,7 +102,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 error={!!errors.email}
                 helperText={errors.email?.message}
                 disabled={isSubmitting}
-                size="medium"
+                size="small"
               />
             )}
           />
@@ -95,7 +110,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* 2. Campo Contraseña */}
         <Stack spacing={0.75}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 600,
+              fontSize: "0.8125rem",
+            }}
+          >
             Contraseña
           </Typography>
           <Controller
@@ -106,12 +128,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 {...field}
                 fullWidth
                 placeholder="••••••••••••"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 disabled={isSubmitting}
-                size="medium"
+                size="small"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -120,15 +142,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
                         size="small"
-                        sx={{ color: 'text.secondary' }}
+                        sx={{ color: "text.secondary" }}
                       >
                         {showPassword ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                             <line x1="1" y1="1" x2="23" y2="23"></line>
                           </svg>
                         ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                           </svg>
@@ -143,7 +183,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </Stack>
 
         {/* 3. Recordarme y Olvido de Contraseña */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Controller
             name="rememberMe"
             control={control}
@@ -159,7 +203,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   />
                 }
                 label={
-                  <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8125rem' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "text.secondary", fontSize: "0.8125rem" }}
+                  >
                     Recordarme
                   </Typography>
                 }
@@ -174,11 +221,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             underline="hover"
             onClick={onForgotPasswordClick}
             sx={{
-              color: 'primary.main',
-              fontSize: '0.8125rem',
+              color: "primary.main",
+              fontSize: "0.8125rem",
               fontWeight: 600,
-              fontFamily: 'inherit',
-              cursor: 'pointer',
+              fontFamily: "inherit",
+              cursor: "pointer",
             }}
           >
             ¿Olvidé mi contraseña?
@@ -194,16 +241,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           fullWidth
           disabled={isSubmitting}
           sx={{
-            py: 1.5,
-            fontSize: '1rem',
+            py: 1.1,
+            fontSize: "1rem",
             fontWeight: 700,
             borderRadius: 1,
           }}
         >
           {isSubmitting ? (
-            <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
+            <CircularProgress size={24} sx={{ color: "#FFFFFF" }} />
           ) : (
-            'Iniciar sesión'
+            "Iniciar sesión"
           )}
         </Button>
       </Stack>

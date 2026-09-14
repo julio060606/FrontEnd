@@ -51,7 +51,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSucces
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ width: '100%' }}>
-      <Stack spacing={2.5}>
+      <Stack spacing={1.75}>
         {/* Banner de error */}
         {errorMessage && (
           <Alert severity="error" sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}>
@@ -67,7 +67,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSucces
         )}
 
         {/* Campo Correo Electrónico */}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.5}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
             Correo electrónico registrado
           </Typography>
@@ -78,6 +78,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSucces
               <TextField
                 {...field}
                 fullWidth
+                size="small"
                 placeholder="ejemplo@correo.com"
                 type="email"
                 autoComplete="email"
@@ -98,7 +99,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSucces
           fullWidth
           disabled={isSubmitting}
           sx={{
-            py: 1.5,
+            py: 1.1,
             fontSize: '1rem',
             fontWeight: 700,
             borderRadius: 1,

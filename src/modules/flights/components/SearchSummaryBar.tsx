@@ -1,124 +1,148 @@
 import React from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Stack,
-  Button,
-} from '@mui/material';
-import { SearchQueryParams } from '../../../types/flight.types';
+import { Box, Typography, Button, Paper, Chip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import FlightIcon from '@mui/icons-material/Flight';
+import { FlightSearchFormData, SearchQueryParams } from '../../../types/flight.types';
 
 export interface SearchSummaryBarProps {
   searchParams?: SearchQueryParams;
+  searchData?: FlightSearchFormData;
   onEditSearchClick?: () => void;
+  onEditClick?: () => void;
 }
 
 export const SearchSummaryBar: React.FC<SearchSummaryBarProps> = ({
   searchParams,
+  searchData,
   onEditSearchClick,
+  onEditClick,
 }) => {
-  const params = searchParams || {
-    origin: 'Lima',
-    originIata: 'LIM',
-    destination: 'Cusco',
-    destinationIata: 'CUZ',
-    departureDate: '15 Sep',
-    returnDate: '20 Sep',
-    passengers: 1,
-    travelClass: 'Económica',
+  const originIata =
+    searchData?.origin?.iataCode ||
+    searchParams?.originIata ||
+    (searchParams?.origin ? searchParams.origin.slice(0, 3).toUpperCase() : 'LIM');
+
+  const destinationIata =
+    searchData?.destination?.iataCode ||
+    searchParams?.destinationIata ||
+    (searchParams?.destination ? searchParams.destination.slice(0, 3).toUpperCase() : 'CUZ');
+
+  const formatDateLabel = (d?: Date | string | null): string => {
+    if (!d) return '';
+    if (typeof d === 'string') return d;
+    try {
+      return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
+    } catch {
+      return String(d);
+    }
+  };
+
+  const depDateText = searchData?.departureDate
+    ? formatDateLabel(searchData.departureDate)
+    : searchParams?.departureDate || '15 Sep';
+
+  const retDateText = searchData?.returnDate
+    ? formatDateLabel(searchData.returnDate)
+    : searchParams?.returnDate || '20 Sep';
+
+  const isRoundTrip = searchData
+    ? searchData.tripType === 'ROUND_TRIP'
+    : Boolean(searchParams?.returnDate);
+
+  const tripDates = isRoundTrip && retDateText ? `${depDateText} - ${retDateText}` : depDateText;
+
+  const passengers = searchData?.passengers || searchParams?.passengers || 1;
+  const passengerText = `${passengers} ${passengers === 1 ? 'Pasajero' : 'Pasajeros'}`;
+
+  const travelClass = (
+    searchData?.travelClass ||
+    searchParams?.travelClass ||
+    'Económica'
+  ).replace('_', ' ');
+
+  const handleEdit = () => {
+    if (onEditSearchClick) {
+      onEditSearchClick();
+    } else if (onEditClick) {
+      onEditClick();
+    }
   };
 
   return (
-    <Box
+    <Paper
+      elevation={0}
       sx={{
-        width: '100%',
-        bgcolor: 'background.paper',
-        borderBottom: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 2,
+        p: 2,
+        borderRadius: '12px',
+        bgcolor: '#FFFFFF',
+        border: '1px solid',
         borderColor: 'divider',
-        py: { xs: 1.5, md: 2 },
-        px: { xs: 2, sm: 4, lg: 8 },
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+        mx: { xs: 2, sm: 4, lg: 6 },
+        mt: 2,
       }}
     >
-      <Container maxWidth="xl" disableGutters>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
-          spacing={{ xs: 1.5, sm: 2 }}
-        >
-          {/* Summary Route & Info */}
-          <Stack
-            direction={{ xs: 'column', md: 'row' }}
-            alignItems={{ xs: 'flex-start', md: 'center' }}
-            spacing={{ xs: 0.5, md: 2 }}
-          >
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Box
-                sx={{
-                  color: 'primary.main',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
-                </svg>
-              </Box>
+      <Box display="flex" alignItems="center" gap={3} flexWrap="wrap">
+        {/* Ruta */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="h5" sx={{ color: 'secondary.main', fontWeight: 800 }}>
+            {originIata}
+          </Typography>
+          <FlightIcon sx={{ color: 'primary.main', transform: 'rotate(90deg)', fontSize: 22 }} />
+          <Typography variant="h5" sx={{ color: 'secondary.main', fontWeight: 800 }}>
+            {destinationIata}
+          </Typography>
+        </Box>
 
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'secondary.main',
-                  fontWeight: 600,
-                  fontSize: { xs: '0.9rem', md: '0.95rem' },
-                }}
-              >
-                Vuelos de {params.origin} ({params.originIata}) a {params.destination} ({params.destinationIata}) · {params.departureDate} {params.returnDate ? `– ${params.returnDate}` : ''}
-              </Typography>
-            </Stack>
+        <Box sx={{ width: '1px', height: 24, bgcolor: 'divider', display: { xs: 'none', sm: 'block' } }} />
 
-            <Box sx={{ display: { xs: 'none', md: 'block' }, color: 'text.secondary' }}>
-              |
-            </Box>
+        {/* Fechas */}
+        <Typography variant="body2" sx={{ color: 'secondary.main', fontWeight: 600 }}>
+          {tripDates}
+        </Typography>
 
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                fontSize: '0.875rem',
-                pl: { xs: 4, md: 0 },
-              }}
-            >
-              {params.passengers} {params.passengers > 1 ? 'pasajeros' : 'pasajero'} · {params.travelClass}
-            </Typography>
-          </Stack>
+        <Box sx={{ width: '1px', height: 24, bgcolor: 'divider', display: { xs: 'none', sm: 'block' } }} />
 
-          {/* Edit Search CTA Button */}
-          <Button
-            variant="text"
-            color="primary"
-            onClick={onEditSearchClick}
-            startIcon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            }
-            sx={{
-              fontWeight: 600,
-              fontSize: '0.875rem',
-              p: 0.5,
-              alignSelf: { xs: 'flex-end', sm: 'center' },
-              '&:hover': {
-                bgcolor: 'soft.primary',
-              },
-            }}
-          >
-            Editar búsqueda
-          </Button>
-        </Stack>
-      </Container>
-    </Box>
+        {/* Info extra */}
+        <Box display="flex" gap={1}>
+          <Chip
+            label={passengerText}
+            size="small"
+            sx={{ bgcolor: 'action.hover', color: 'text.secondary', borderRadius: '6px', fontWeight: 600 }}
+          />
+          <Chip
+            label={travelClass}
+            size="small"
+            sx={{ bgcolor: 'soft.primary', color: 'primary.main', borderRadius: '6px', fontWeight: 600 }}
+          />
+        </Box>
+      </Box>
+
+      {/* Botón Modificar */}
+      <Button
+        variant="outlined"
+        startIcon={<EditIcon />}
+        onClick={handleEdit}
+        sx={{
+          color: 'primary.main',
+          borderColor: 'divider',
+          textTransform: 'none',
+          borderRadius: '8px',
+          fontWeight: 700,
+          '&:hover': {
+            bgcolor: 'soft.primary',
+            borderColor: 'primary.main',
+          },
+        }}
+      >
+        Modificar
+      </Button>
+    </Paper>
   );
 };
 

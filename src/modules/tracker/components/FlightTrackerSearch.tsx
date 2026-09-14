@@ -124,10 +124,15 @@ export const FlightTrackerSearch: React.FC<FlightTrackerSearchProps> = ({
               </svg>
             }
             sx={{
-              height: 52,
+              height: 48,
+              px: { xs: 2, sm: 4.5 },
               fontWeight: 700,
               fontSize: '1rem',
               borderRadius: 1,
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+              },
             }}
           >
             Rastrear vuelo

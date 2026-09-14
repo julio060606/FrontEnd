@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import HeroSearch from '../components/HeroSearch';
+import { Box } from '@mui/material';
+import HeroSection from '../components/HeroSection';
 import PopularDestinations from '../components/PopularDestinations';
 import AiFlightComparison from '../components/AiFlightComparison';
 import PromoBanner from '../components/PromoBanner';
 import { homeService } from '../../../services/homeService';
-import { PopularDestination, AiComparisonScenario, HeroSearchValues } from '../../../types/home.types';
+import { flightService } from '../../../services/flightService';
+import { PopularDestination, AiComparisonScenario } from '../../../types/home.types';
+import { searchFlightsMock } from '../../flights/services/flight.service.mock';
+import { FlightSearchFormData } from '../../../types/flight.types';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -45,13 +48,56 @@ export const Home: React.FC = () => {
     };
   }, []);
 
-  const handleSearch = (searchValues: HeroSearchValues) => {
-    console.log('Ejecutando búsqueda con parámetros:', searchValues);
-    // Redirección o actualización de estado para el buscador del Sprint 1
+  const handleSearch = async (formData: FlightSearchFormData) => {
+    if (!formData.origin || !formData.destination) return;
+
+    try {
+      const depDateFormatted = formData.departureDate
+        ? formData.departureDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
+        : '15 Sep';
+
+      const retDateFormatted = formData.returnDate
+        ? formData.returnDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
+        : undefined;
+
+      // Actualizar los parámetros en el servicio de vuelos
+      flightService.setCurrentSearchParams({
+        origin: formData.origin.city,
+        originIata: formData.origin.iataCode,
+        destination: formData.destination.city,
+        destinationIata: formData.destination.iataCode,
+        departureDate: depDateFormatted,
+        returnDate: formData.tripType === 'ROUND_TRIP' ? retDateFormatted : undefined,
+        passengers: formData.passengers,
+        travelClass: formData.travelClass === 'ECONOMY' ? 'Económica' : formData.travelClass,
+        tripType: formData.tripType,
+      });
+
+      // Ejecución del mock de búsqueda de US04
+      const vuelosSimulados = await searchFlightsMock(formData);
+      console.log('✈️ Vuelos encontrados de forma simulada (Mock US04):', vuelosSimulados);
+
+      // Redirección a la pantalla de resultados
+      navigate('/flights');
+    } catch (error) {
+      console.error('Error al procesar búsqueda de vuelos:', error);
+    }
   };
 
   const handleDestinationClick = (destination: PopularDestination) => {
-    console.log('Destino seleccionado:', destination.city);
+    console.log('Destino popular seleccionado:', destination.city);
+    flightService.setCurrentSearchParams({
+      origin: 'Lima',
+      originIata: 'LIM',
+      destination: destination.city,
+      destinationIata: destination.id.replace('dest-', '').toUpperCase(),
+      departureDate: '15 Sep',
+      returnDate: '20 Sep',
+      passengers: 1,
+      travelClass: 'Económica',
+      tripType: 'ROUND_TRIP',
+    });
+    navigate('/flights');
   };
 
   const handleCompareClick = (scenario: AiComparisonScenario) => {
@@ -60,35 +106,30 @@ export const Home: React.FC = () => {
     );
   };
 
-  const handleLoginClick = () => {
-    console.log('Abrir modal de login');
-  };
-
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
-      {/* Hero con Buscador Integrado */}
+      {/* 1. Hero con Buscador Integrado (US01 + US04) */}
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSearch onSearch={handleSearch} />
+        <HeroSection onSearch={handleSearch} />
 
-        {/* 3. Sección A: Destinos Populares */}
+        {/* 2. Destinos Populares en Perú */}
         <PopularDestinations
           destinations={destinations}
           isLoading={isLoadingDestinations}
           onDestinationClick={handleDestinationClick}
         />
 
-        {/* 4. Sección B: Recomendación y Comparador Asistido por IA */}
+        {/* 3. Escenario y Comparador Asistido por IA */}
         <AiFlightComparison
           scenario={aiScenario}
           onCompareClick={handleCompareClick}
         />
 
-        {/* 5. Sección C: Banner Promocional de Alertas */}
+        {/* 4. Banner Promocional de Alertas y Monitoreo */}
         <PromoBanner
-          onBannerActionClick={() => console.log('Activar alertas')}
+          onBannerActionClick={() => navigate('/tracker')}
         />
       </Box>
-
     </Box>
   );
 };

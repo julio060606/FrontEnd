@@ -6,6 +6,8 @@ import {
   Stack,
   Grid,
   Skeleton,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import FlightTrackerSearch from '../components/FlightTrackerSearch';
 import FlightStatusBanner from '../components/FlightStatusBanner';
@@ -19,6 +21,8 @@ import { FlightTrackDetail } from '../../../types/tracker.types';
 export const FlightTrackerPage: React.FC = () => {
   const [flightData, setFlightData] = useState<FlightTrackDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   const fetchTrackData = async (flightNum: string = 'LA 2045', date: string = '15 Sep 2025') => {
     try {
@@ -38,6 +42,13 @@ export const FlightTrackerPage: React.FC = () => {
 
   const handleSearch = (flightNumber: string, date: string) => {
     fetchTrackData(flightNumber, date);
+    setSnackbarMessage(`Buscando telemetría para el vuelo ${flightNumber}`);
+    setSnackbarOpen(true);
+  };
+
+  const handleNotificationsChange = (newSettings: any) => {
+    setSnackbarMessage('Preferencias de alerta actualizadas correctamente');
+    setSnackbarOpen(true);
   };
 
   return (
@@ -59,7 +70,7 @@ export const FlightTrackerPage: React.FC = () => {
                 Seguimiento de vuelo
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1rem', mt: 0.5 }}>
-                Consulta el estado de tu vuelo en tiempo real
+                Consulta el estado de tu vuelo y telemetría en tiempo real
               </Typography>
             </Box>
 
@@ -85,16 +96,24 @@ export const FlightTrackerPage: React.FC = () => {
                 {/* Banner de Estado en Vivo */}
                 <FlightStatusBanner flight={flightData} />
 
-                {/* Grid Superior: Barra de Progreso y Ficha Técnica */}
-                <Grid container spacing={3.5} alignItems="stretch">
-                  <Grid item xs={12} lg={7.5} xl={8}>
+                {/* Fila Superior: Barra de Progreso (Flex 1) y Ficha Técnica (440px fija en desktop) */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                    alignItems: 'stretch',
+                    gap: 4,
+                    width: '100%',
+                  }}
+                >
+                  <Box sx={{ flex: '1 1 0', display: 'flex', width: '100%', minWidth: 0 }}>
                     <FlightTimelineProgressBar flight={flightData} />
-                  </Grid>
+                  </Box>
 
-                  <Grid item xs={12} lg={4.5} xl={4}>
+                  <Box sx={{ width: { xs: '100%', lg: 440 }, flexShrink: 0, display: 'flex' }}>
                     <FlightLiveInfoCard flight={flightData} />
-                  </Grid>
-                </Grid>
+                  </Box>
+                </Box>
 
                 {/* Cronología e Historial de Eventos */}
                 <FlightChronology events={flightData.chronology} />
@@ -102,7 +121,7 @@ export const FlightTrackerPage: React.FC = () => {
                 {/* Configuración de Alertas y Notificaciones */}
                 <FlightNotificationToggles
                   initialSettings={flightData.notificationSettings}
-                  onChange={(newSettings) => console.log('Notificaciones actualizadas:', newSettings)}
+                  onChange={handleNotificationsChange}
                 />
               </Stack>
             )}
@@ -110,6 +129,22 @@ export const FlightTrackerPage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* Feedback flotante para interacción de usuario */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%', borderRadius: 2, fontWeight: 600 }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

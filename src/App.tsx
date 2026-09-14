@@ -48,6 +48,7 @@ export const App: React.FC = () => {
             {/* 5. Rastreador y Estado de Vuelo en Vivo */}
             <Route path="/tracker" element={<FlightTrackerPage />} />
             <Route path="/tracker/:flightId" element={<FlightTrackerPage />} />
+            <Route path="/status" element={<Navigate to="/tracker" replace />} />
 
             {/* 6. Autenticación */}
             <Route path="/login" element={<LoginPage />} />

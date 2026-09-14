@@ -1,5 +1,6 @@
 export * from './pages/Home';
-export * from './components/HeroSearch';
+export * from './components/HeroSection';
+export * from './components/SearchForm';
 export * from './components/PopularDestinations';
 export * from './components/AiFlightComparison';
 export * from './components/PromoBanner';

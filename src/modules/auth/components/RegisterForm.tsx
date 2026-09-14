@@ -62,7 +62,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ width: '100%' }}>
-      <Stack spacing={2.5}>
+      <Stack spacing={1.5}>
         {/* Banner de error */}
         {errorMessage && (
           <Alert severity="error" sx={{ borderRadius: 1.5, fontSize: '0.85rem' }}>
@@ -71,9 +71,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         )}
 
         {/* Nombres y Apellidos */}
-        <Grid container spacing={2}>
+        <Grid container spacing={1.5}>
           <Grid item xs={12} sm={6}>
-            <Stack spacing={0.75}>
+            <Stack spacing={0.5}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
                 Nombre
               </Typography>
@@ -84,6 +84,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                   <TextField
                     {...field}
                     fullWidth
+                    size="small"
                     placeholder="Juan"
                     autoComplete="given-name"
                     error={!!errors.firstName}
@@ -95,7 +96,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             </Stack>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Stack spacing={0.75}>
+            <Stack spacing={0.5}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
                 Apellido
               </Typography>
@@ -106,6 +107,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
                   <TextField
                     {...field}
                     fullWidth
+                    size="small"
                     placeholder="Pérez"
                     autoComplete="family-name"
                     error={!!errors.lastName}
@@ -119,7 +121,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         </Grid>
 
         {/* Correo Electrónico */}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.5}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
             Correo electrónico
           </Typography>
@@ -130,6 +132,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
               <TextField
                 {...field}
                 fullWidth
+                size="small"
                 placeholder="ejemplo@correo.com"
                 type="email"
                 autoComplete="email"
@@ -142,7 +145,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         </Stack>
 
         {/* Teléfono (Opcional) */}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.5}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
             Teléfono (opcional)
           </Typography>
@@ -153,6 +156,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
               <TextField
                 {...field}
                 fullWidth
+                size="small"
                 placeholder="+51 987 654 321"
                 type="tel"
                 autoComplete="tel"
@@ -165,7 +169,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         </Stack>
 
         {/* Contraseña */}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.5}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
             Contraseña
           </Typography>
@@ -176,7 +180,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Mínimo 8 caracteres, 1 mayúscula, 1 número"
+                size="small"
+                placeholder="Mínimo 8 car., 1 mayúscula, 1 número"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 error={!!errors.password}
@@ -213,7 +218,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         </Stack>
 
         {/* Confirmar Contraseña */}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.5}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8125rem' }}>
             Confirmar contraseña
           </Typography>
@@ -224,6 +229,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
               <TextField
                 {...field}
                 fullWidth
+                size="small"
                 placeholder="Repita su contraseña"
                 type={showConfirmPassword ? 'text' : 'password'}
                 autoComplete="new-password"
@@ -301,7 +307,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           fullWidth
           disabled={isSubmitting}
           sx={{
-            py: 1.5,
+            py: 1.1,
             fontSize: '1rem',
             fontWeight: 700,
             borderRadius: 1,
