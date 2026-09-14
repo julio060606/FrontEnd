@@ -7,15 +7,23 @@ import {
   Paper,
   Divider,
 } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { FlightItem } from '../../../types/flight.types';
 
 export interface FlightCardProps {
   flight: FlightItem;
+  isSelectedForComparison?: boolean;
+  isComparisonSelectionDisabled?: boolean;
+  onComparisonToggle?: (flight: FlightItem) => void;
   onViewDetailsClick?: (flight: FlightItem) => void;
 }
 
 export const FlightCard: React.FC<FlightCardProps> = ({
   flight,
+  isSelectedForComparison = false,
+  isComparisonSelectionDisabled = false,
+  onComparisonToggle,
   onViewDetailsClick,
 }) => {
   // Mapeo semántico de colores para el badge de la aerolínea
@@ -39,14 +47,16 @@ export const FlightCard: React.FC<FlightCardProps> = ({
 
   return (
     <Paper
+      component="article"
+      aria-label={`Vuelo ${flight.flightNumber} de ${flight.airline.name}`}
       elevation={0}
       sx={{
         width: '100%',
         p: { xs: 2.5, md: 3 },
-        bgcolor: 'background.paper',
+        bgcolor: isSelectedForComparison ? 'soft.primary' : 'background.paper',
         borderRadius: 3,
-        border: 1,
-        borderColor: 'divider',
+        border: isSelectedForComparison ? 2 : 1,
+        borderColor: isSelectedForComparison ? 'primary.main' : 'divider',
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
         transition: 'all 0.2s ease-in-out',
         '&:hover': {
@@ -178,21 +188,40 @@ export const FlightCard: React.FC<FlightCardProps> = ({
             </Typography>
           </Box>
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => onViewDetailsClick?.(flight)}
-            sx={{
-              px: 2.5,
-              py: 1.25,
-              borderRadius: 1,
-              fontWeight: 700,
-              fontSize: '0.875rem',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Ver detalles
-          </Button>
+          <Stack spacing={0.75} sx={{ minWidth: { xs: 142, sm: 160 } }}>
+            <Button
+              variant={isSelectedForComparison ? 'contained' : 'outlined'}
+              color="primary"
+              disabled={isComparisonSelectionDisabled && !isSelectedForComparison}
+              aria-pressed={isSelectedForComparison}
+              aria-label={
+                isSelectedForComparison
+                  ? `Quitar vuelo ${flight.flightNumber} de la comparación`
+                  : `Agregar vuelo ${flight.flightNumber} a la comparación`
+              }
+              startIcon={isSelectedForComparison ? <CheckCircleIcon /> : <AddCircleOutlineIcon />}
+              onClick={() => onComparisonToggle?.(flight)}
+              sx={{
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                fontWeight: 700,
+                fontSize: '0.8125rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {isSelectedForComparison ? 'Seleccionado' : 'Comparar'}
+            </Button>
+
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={() => onViewDetailsClick?.(flight)}
+              sx={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}
+            >
+              Ver detalles
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </Paper>

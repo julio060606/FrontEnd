@@ -3,6 +3,7 @@ export * from './pages/FlightDetailPage';
 export * from './components/SearchSummaryBar';
 export * from './components/FilterSidebar';
 export * from './components/FlightCard';
+export * from './components/ComparisonSelectionBar';
 export * from './components/FlightDetailHeader';
 export * from './components/FlightAmenitiesAndPolicies';
 export * from './components/FareSummary';
