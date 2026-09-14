@@ -10,6 +10,18 @@ export interface Airline {
   logoUrl?: string;
 }
 
+export interface FlightAmenities {
+  carryOnKg: number;
+  checkedBaggageIncluded: boolean;
+  checkedBaggageKg?: number;
+  checkedBaggagePrice?: number;
+  wifiAvailable: boolean;
+  snacksIncluded: boolean;
+  changeAllowed: boolean;
+  changeFee?: number;
+  punctualityPercentage: number;
+}
+
 export interface FlightItem {
   id: string;
   airline: Airline;
@@ -19,6 +31,8 @@ export interface FlightItem {
   originCity: string;
   destinationIata: string;
   destinationCity: string;
+  departureDate: string;
+  returnDate?: string;
   departureTime: string; // "14:20"
   arrivalTime: string;   // "15:40"
   durationFormatted: string; // "1h 20m"
@@ -29,6 +43,7 @@ export interface FlightItem {
   currency: string;
   tripTypeLabel: string; // "Ida y vuelta" | "Solo ida"
   timeOfDay: TimeOfDay;
+  amenities: FlightAmenities;
 }
 
 export interface FlightFilterState {

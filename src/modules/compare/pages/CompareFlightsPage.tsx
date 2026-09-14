@@ -14,9 +14,11 @@ import {
   Link,
   Skeleton,
   Paper,
+  Alert,
 } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CompareHeaderCards from '../components/CompareHeaderCards';
 import CompareSpecsTable from '../components/CompareSpecsTable';
 import AIRecommendationBanner from '../components/AIRecommendationBanner';
@@ -47,6 +49,7 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
   );
   const [data, setData] = useState<FlightComparisonData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const resultsSearchParams = new URLSearchParams();
   if (selectedFlightIdA) {
@@ -62,6 +65,7 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
 
     if (!hasValidSelection || !selectedFlightIdA || !selectedFlightIdB) {
       setData(null);
+      setErrorMessage(null);
       setIsLoading(false);
 
       return () => {
@@ -72,6 +76,8 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
     const loadComparison = async () => {
       try {
         setIsLoading(true);
+        setData(null);
+        setErrorMessage(null);
         const result = await compareService.getFlightComparison(
           selectedFlightIdA,
           selectedFlightIdB,
@@ -81,6 +87,13 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
         }
       } catch (error) {
         console.error('Error al cargar comparación de vuelos:', error);
+        if (isMounted) {
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : 'No pudimos preparar la comparación solicitada.',
+          );
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -217,6 +230,33 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
                   Seleccionar vuelos
                 </Button>
               </Paper>
+            ) : errorMessage ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 4, md: 6 },
+                  textAlign: 'center',
+                  borderRadius: 4,
+                  border: 1,
+                  borderColor: 'error.main',
+                }}
+              >
+                <ErrorOutlineIcon sx={{ color: 'error.main', fontSize: 52, mb: 2 }} />
+                <Typography variant="h3" sx={{ color: 'secondary.main', mb: 2 }}>
+                  No podemos comparar estos vuelos
+                </Typography>
+                <Alert severity="error" sx={{ maxWidth: 620, mx: 'auto', mb: 3, textAlign: 'left' }}>
+                  {errorMessage}
+                </Alert>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<ArrowBackIcon />}
+                  onClick={handleNavigateBack}
+                >
+                  Elegir otros vuelos
+                </Button>
+              </Paper>
             ) : isLoading || !data ? (
               <Stack spacing={4}>
                 <Skeleton variant="rounded" height={220} sx={{ borderRadius: 4 }} />
@@ -239,8 +279,10 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
                   specs={data.specs}
                 />
 
-                {/* Bloque Inferior: Recomendación Inteligente de la IA */}
-                <AIRecommendationBanner recommendation={data.recommendation} />
+                {/* La recomendación explicable se incorpora en la Parte 4. */}
+                {data.recommendation && (
+                  <AIRecommendationBanner recommendation={data.recommendation} />
+                )}
               </Stack>
             )}
           </Stack>

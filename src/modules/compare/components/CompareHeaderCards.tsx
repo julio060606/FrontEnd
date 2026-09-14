@@ -21,7 +21,31 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
   flightB,
   onSelectFlight,
 }) => {
-  const renderFlightCard = (flight: CompareFlightCardData, isA: boolean) => (
+  const formatDate = (date: string): string =>
+    new Intl.DateTimeFormat('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${date}T00:00:00Z`));
+
+  const getAirlineBadgeColor = (badgeType: CompareFlightCardData['airline']['colorBadge']) => {
+    switch (badgeType) {
+      case 'success':
+        return 'success.main';
+      case 'warning':
+        return 'warning.main';
+      case 'error':
+        return 'error.main';
+      case 'info':
+        return 'info.main';
+      case 'primary':
+      default:
+        return 'primary.main';
+    }
+  };
+
+  const renderFlightCard = (flight: CompareFlightCardData) => (
     <Paper
       elevation={0}
       sx={{
@@ -45,7 +69,7 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
             sx={{
               width: 40,
               height: 40,
-              bgcolor: isA ? 'success.main' : 'primary.main',
+              bgcolor: getAirlineBadgeColor(flight.airline.colorBadge),
               borderRadius: 2,
               display: 'flex',
               alignItems: 'center',
@@ -63,7 +87,7 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
               {flight.airline.name}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-              {flight.cabinClass}
+              {flight.flightNumber} · {flight.cabinClass}
             </Typography>
           </Box>
         </Stack>
@@ -74,6 +98,11 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
           </Typography>
         </Box>
       </Stack>
+
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+        Salida: {formatDate(flight.departureDate)}
+        {flight.returnDate ? ` · Regreso: ${formatDate(flight.returnDate)}` : ''}
+      </Typography>
 
       <Divider />
 
@@ -175,11 +204,11 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
     <Box sx={{ position: 'relative', width: '100%' }}>
       <Grid container spacing={{ xs: 3, md: 4 }} alignItems="stretch">
         <Grid item xs={12} md={6}>
-          {renderFlightCard(flightA, true)}
+          {renderFlightCard(flightA)}
         </Grid>
 
         <Grid item xs={12} md={6}>
-          {renderFlightCard(flightB, false)}
+          {renderFlightCard(flightB)}
         </Grid>
       </Grid>
 
