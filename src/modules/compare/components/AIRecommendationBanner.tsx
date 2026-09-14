@@ -5,15 +5,21 @@ import {
   Stack,
   Divider,
   LinearProgress,
+  Button,
 } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { AIRecommendation } from '../../../types/compare.types';
 
 export interface AIRecommendationBannerProps {
   recommendation: AIRecommendation;
+  isRecommendedFlightSelected?: boolean;
+  onSelectRecommended?: () => void;
 }
 
 export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
   recommendation,
+  isRecommendedFlightSelected = false,
+  onSelectRecommended,
 }) => {
   return (
     <Box
@@ -85,6 +91,26 @@ export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
         >
           {recommendation.description}
         </Typography>
+
+        {onSelectRecommended && (
+          <Button
+            variant={isRecommendedFlightSelected ? 'outlined' : 'contained'}
+            color="warning"
+            startIcon={<CheckCircleOutlineIcon />}
+            aria-pressed={isRecommendedFlightSelected}
+            onClick={onSelectRecommended}
+            sx={{
+              alignSelf: 'flex-start',
+              color: isRecommendedFlightSelected ? 'warning.main' : 'secondary.main',
+              borderColor: 'warning.main',
+              fontWeight: 800,
+            }}
+          >
+            {isRecommendedFlightSelected
+              ? `${recommendation.recommendedFlightNumber} elegido`
+              : `Elegir ${recommendation.recommendedFlightNumber}`}
+          </Button>
+        )}
 
         <Stack spacing={1.5} aria-label="Puntuación de los vuelos comparados">
           {[

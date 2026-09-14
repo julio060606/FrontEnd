@@ -58,6 +58,11 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
   const [comparisonSearchParams, setComparisonSearchParams] = useSearchParams();
   const selectedFlightIdA = flightIdA ?? comparisonSearchParams.get('flightA') ?? undefined;
   const selectedFlightIdB = flightIdB ?? comparisonSearchParams.get('flightB') ?? undefined;
+  const selectedFlightCandidate = comparisonSearchParams.get('selected') ?? undefined;
+  const selectedFlightId = selectedFlightCandidate === selectedFlightIdA
+    || selectedFlightCandidate === selectedFlightIdB
+    ? selectedFlightCandidate
+    : undefined;
   const hasValidSelection = Boolean(
     selectedFlightIdA
       && selectedFlightIdB
@@ -151,8 +156,16 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
   };
 
   const handleSelectFlight = (flight: CompareFlightCardData) => {
-    console.log('Vuelo seleccionado de la comparación:', flight);
+    const nextSearchParams = new URLSearchParams(comparisonSearchParams);
+    nextSearchParams.set('selected', flight.id);
+    setComparisonSearchParams(nextSearchParams, { replace: true });
     onFlightSelected?.(flight);
+  };
+
+  const handleClearSelection = () => {
+    const nextSearchParams = new URLSearchParams(comparisonSearchParams);
+    nextSearchParams.delete('selected');
+    setComparisonSearchParams(nextSearchParams, { replace: true });
   };
 
   return (
@@ -303,10 +316,53 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
                   onChange={handlePriorityChange}
                 />
 
+                {selectedFlightId && (() => {
+                  const selectedFlight = selectedFlightId === data.flightA.id
+                    ? data.flightA
+                    : data.flightB;
+
+                  return (
+                    <Alert
+                      severity="success"
+                      sx={{
+                        alignItems: 'flex-start',
+                        borderRadius: 2,
+                        '& .MuiAlert-message': { width: '100%' },
+                      }}
+                    >
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        alignItems={{ xs: 'flex-start', sm: 'center' }}
+                        justifyContent="space-between"
+                        spacing={1.5}
+                      >
+                        <Box>
+                          <Typography variant="body2" fontWeight={700}>
+                            Elegiste {selectedFlight.airline.name} {selectedFlight.flightNumber}
+                          </Typography>
+                          <Typography variant="caption">
+                            Guardamos tu decisión en esta comparación. Esto no realiza una compra ni una reserva.
+                          </Typography>
+                        </Box>
+                        <Button
+                          color="inherit"
+                          size="small"
+                          onClick={handleClearSelection}
+                          sx={{ flexShrink: 0 }}
+                        >
+                          Quitar elección
+                        </Button>
+                      </Stack>
+                    </Alert>
+                  );
+                })()}
+
                 {/* Bloque Superior: Tarjetas de Vuelo con VS */}
                 <CompareHeaderCards
                   flightA={data.flightA}
                   flightB={data.flightB}
+                  recommendedFlightId={data.recommendation?.recommendedFlightId}
+                  selectedFlightId={selectedFlightId}
                   onSelectFlight={handleSelectFlight}
                 />
 
@@ -318,7 +374,18 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
                 />
 
                 {data.recommendation && (
-                  <AIRecommendationBanner recommendation={data.recommendation} />
+                  <AIRecommendationBanner
+                    recommendation={data.recommendation}
+                    isRecommendedFlightSelected={
+                      selectedFlightId === data.recommendation.recommendedFlightId
+                    }
+                    onSelectRecommended={() => {
+                      const recommendedFlight = data.recommendation?.recommendedFlightId === data.flightA.id
+                        ? data.flightA
+                        : data.flightB;
+                      handleSelectFlight(recommendedFlight);
+                    }}
+                  />
                 )}
               </Stack>
             )}
