@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import HeroSearch from '../components/HeroSearch';
 import PopularDestinations from '../components/PopularDestinations';
 import AiFlightComparison from '../components/AiFlightComparison';
@@ -8,6 +9,7 @@ import { homeService } from '../../../services/homeService';
 import { PopularDestination, AiComparisonScenario, HeroSearchValues } from '../../../types/home.types';
 
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
   const [destinations, setDestinations] = useState<PopularDestination[]>([]);
   const [aiScenario, setAiScenario] = useState<AiComparisonScenario | undefined>(undefined);
   const [isLoadingDestinations, setIsLoadingDestinations] = useState<boolean>(true);
@@ -53,7 +55,9 @@ export const Home: React.FC = () => {
   };
 
   const handleCompareClick = (scenario: AiComparisonScenario) => {
-    console.log('Comparando vuelos asistidos por IA:', scenario);
+    navigate(
+      `/compare?flightA=${encodeURIComponent(scenario.flight1.id)}&flightB=${encodeURIComponent(scenario.flight2.id)}`,
+    );
   };
 
   const handleLoginClick = () => {

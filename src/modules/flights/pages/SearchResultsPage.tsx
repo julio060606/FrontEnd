@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -25,6 +26,8 @@ import {
 
 export const SearchResultsPage: React.FC = () => {
   const maxComparisonFlights = 2;
+  const navigate = useNavigate();
+  const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const [searchParams, setSearchParams] = useState<SearchQueryParams | undefined>(undefined);
   const [flights, setFlights] = useState<FlightItem[]>([]);
   const [selectedFlights, setSelectedFlights] = useState<FlightItem[]>([]);
@@ -37,6 +40,35 @@ export const SearchResultsPage: React.FC = () => {
     departureTimes: ['AFTERNOON'],
   });
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const comparisonIds = [
+      urlSearchParams.get('flightA'),
+      urlSearchParams.get('flightB'),
+    ].filter((flightId): flightId is string => Boolean(flightId));
+    const uniqueComparisonIds = [...new Set(comparisonIds)].slice(0, maxComparisonFlights);
+
+    if (uniqueComparisonIds.length === 0) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const restoreComparisonSelection = async () => {
+      const restoredFlights = await flightService.getFlightsByIds(uniqueComparisonIds);
+
+      if (isMounted) {
+        setSelectedFlights(restoredFlights);
+      }
+    };
+
+    restoreComparisonSelection();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [urlSearchParams]);
 
   useEffect(() => {
     let isMounted = true;
@@ -75,26 +107,41 @@ export const SearchResultsPage: React.FC = () => {
     console.log('Detalles del vuelo seleccionado:', flight.flightNumber, flight.airline.name);
   };
 
+  const updateComparisonUrl = (selection: FlightItem[]) => {
+    const nextSearchParams = new URLSearchParams(urlSearchParams);
+    nextSearchParams.delete('flightA');
+    nextSearchParams.delete('flightB');
+
+    if (selection[0]) {
+      nextSearchParams.set('flightA', selection[0].id);
+    }
+
+    if (selection[1]) {
+      nextSearchParams.set('flightB', selection[1].id);
+    }
+
+    setUrlSearchParams(nextSearchParams, { replace: true });
+  };
+
   const handleComparisonToggle = (flight: FlightItem) => {
-    setSelectedFlights((currentSelection) => {
-      const isAlreadySelected = currentSelection.some((item) => item.id === flight.id);
+    const isAlreadySelected = selectedFlights.some((item) => item.id === flight.id);
+    const nextSelection = isAlreadySelected
+      ? selectedFlights.filter((item) => item.id !== flight.id)
+      : [...selectedFlights, flight].slice(0, maxComparisonFlights);
 
-      if (isAlreadySelected) {
-        return currentSelection.filter((item) => item.id !== flight.id);
-      }
-
-      if (currentSelection.length >= maxComparisonFlights) {
-        return currentSelection;
-      }
-
-      return [...currentSelection, flight];
-    });
+    setSelectedFlights(nextSelection);
+    updateComparisonUrl(nextSelection);
   };
 
   const handleRemoveComparisonFlight = (flightId: string) => {
-    setSelectedFlights((currentSelection) =>
-      currentSelection.filter((flight) => flight.id !== flightId),
-    );
+    const nextSelection = selectedFlights.filter((flight) => flight.id !== flightId);
+    setSelectedFlights(nextSelection);
+    updateComparisonUrl(nextSelection);
+  };
+
+  const handleClearComparisonSelection = () => {
+    setSelectedFlights([]);
+    updateComparisonUrl([]);
   };
 
   const handleCompareSelectedFlights = () => {
@@ -102,10 +149,8 @@ export const SearchResultsPage: React.FC = () => {
       return;
     }
 
-    console.log(
-      'Vuelos listos para comparar:',
-      selectedFlights.map((flight) => flight.id),
-    );
+    const [flightA, flightB] = selectedFlights;
+    navigate(`/compare?flightA=${encodeURIComponent(flightA.id)}&flightB=${encodeURIComponent(flightB.id)}`);
   };
 
   return (
@@ -321,7 +366,7 @@ export const SearchResultsPage: React.FC = () => {
       <ComparisonSelectionBar
         selectedFlights={selectedFlights}
         onRemoveFlight={handleRemoveComparisonFlight}
-        onClear={() => setSelectedFlights([])}
+        onClear={handleClearComparisonSelection}
         onCompare={handleCompareSelectedFlights}
       />
 
