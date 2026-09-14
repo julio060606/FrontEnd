@@ -104,7 +104,15 @@ export const MOCK_FLIGHT_COMPARISON: FlightComparisonData = {
     },
   ],
   recommendation: {
+    recommendedFlightId: 'h2-sky-5110',
+    recommendedFlightNumber: 'H25021',
     recommendedAirlineName: 'Sky Airline',
+    alternativeFlightNumber: 'LA2040',
+    alternativeAirlineName: 'LATAM Airlines',
+    recommendedScore: 68,
+    alternativeScore: 32,
+    priority: 'BALANCED',
+    priorityLabel: 'Equilibrado',
     title: 'Te recomendamos el vuelo de Sky Airline',
     description: 'Nuestro asistente inteligente analizó la combinación de costos, servicios y valoraciones para tu ruta.',
     reasons: [

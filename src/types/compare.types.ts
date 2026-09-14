@@ -21,6 +21,12 @@ export interface CompareFlightCardData {
 
 export type SpecValueType = 'text' | 'boolean' | 'price' | 'percentage';
 
+export type ComparisonPriority =
+  | 'BALANCED'
+  | 'LOWEST_PRICE'
+  | 'SHORTEST_TIME'
+  | 'MOST_COMPLETE';
+
 export interface CompareSpecValue {
   text: string;
   isPositive?: boolean;
@@ -38,7 +44,15 @@ export interface CompareSpecItem {
 }
 
 export interface AIRecommendation {
+  recommendedFlightId: string;
+  recommendedFlightNumber: string;
   recommendedAirlineName: string;
+  alternativeFlightNumber: string;
+  alternativeAirlineName: string;
+  recommendedScore: number;
+  alternativeScore: number;
+  priority: ComparisonPriority;
+  priorityLabel: string;
   title: string;
   description: string;
   reasons: {

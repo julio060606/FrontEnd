@@ -22,8 +22,24 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CompareHeaderCards from '../components/CompareHeaderCards';
 import CompareSpecsTable from '../components/CompareSpecsTable';
 import AIRecommendationBanner from '../components/AIRecommendationBanner';
+import ComparisonPrioritySelector from '../components/ComparisonPrioritySelector';
 import { compareService } from '../../../services/compareService';
-import { FlightComparisonData, CompareFlightCardData } from '../../../types/compare.types';
+import {
+  FlightComparisonData,
+  CompareFlightCardData,
+  ComparisonPriority,
+} from '../../../types/compare.types';
+
+const parseComparisonPriority = (value: string | null): ComparisonPriority => {
+  switch (value) {
+    case 'LOWEST_PRICE':
+    case 'SHORTEST_TIME':
+    case 'MOST_COMPLETE':
+      return value;
+    default:
+      return 'BALANCED';
+  }
+};
 
 export interface CompareFlightsPageProps {
   flightIdA?: string;
@@ -39,7 +55,7 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
   onFlightSelected,
 }) => {
   const navigate = useNavigate();
-  const [comparisonSearchParams] = useSearchParams();
+  const [comparisonSearchParams, setComparisonSearchParams] = useSearchParams();
   const selectedFlightIdA = flightIdA ?? comparisonSearchParams.get('flightA') ?? undefined;
   const selectedFlightIdB = flightIdB ?? comparisonSearchParams.get('flightB') ?? undefined;
   const hasValidSelection = Boolean(
@@ -50,6 +66,9 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
   const [data, setData] = useState<FlightComparisonData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [priority, setPriority] = useState<ComparisonPriority>(() =>
+    parseComparisonPriority(comparisonSearchParams.get('priority')),
+  );
 
   const resultsSearchParams = new URLSearchParams();
   if (selectedFlightIdA) {
@@ -81,6 +100,7 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
         const result = await compareService.getFlightComparison(
           selectedFlightIdA,
           selectedFlightIdB,
+          priority,
         );
         if (isMounted) {
           setData(result);
@@ -106,7 +126,20 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [hasValidSelection, selectedFlightIdA, selectedFlightIdB]);
+  }, [hasValidSelection, priority, selectedFlightIdA, selectedFlightIdB]);
+
+  const handlePriorityChange = (selectedPriority: ComparisonPriority) => {
+    setPriority(selectedPriority);
+    const nextSearchParams = new URLSearchParams(comparisonSearchParams);
+
+    if (selectedPriority === 'BALANCED') {
+      nextSearchParams.delete('priority');
+    } else {
+      nextSearchParams.set('priority', selectedPriority);
+    }
+
+    setComparisonSearchParams(nextSearchParams, { replace: true });
+  };
 
   const handleNavigateBack = () => {
     if (onNavigateBack) {
@@ -265,6 +298,11 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
               </Stack>
             ) : (
               <Stack spacing={4}>
+                <ComparisonPrioritySelector
+                  value={priority}
+                  onChange={handlePriorityChange}
+                />
+
                 {/* Bloque Superior: Tarjetas de Vuelo con VS */}
                 <CompareHeaderCards
                   flightA={data.flightA}
@@ -279,7 +317,6 @@ export const CompareFlightsPage: React.FC<CompareFlightsPageProps> = ({
                   specs={data.specs}
                 />
 
-                {/* La recomendación explicable se incorpora en la Parte 4. */}
                 {data.recommendation && (
                   <AIRecommendationBanner recommendation={data.recommendation} />
                 )}
