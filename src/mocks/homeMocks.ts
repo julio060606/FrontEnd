@@ -60,7 +60,7 @@ export const MOCK_AI_COMPARISON_SCENARIO: AiComparisonScenario = {
   dateFormatted: '15 Sep 2025',
   modality: 'Ida y Vuelta',
   flight1: {
-    id: 'f-sky-101',
+    id: 'fl-001',
     airlineName: 'Sky Airline',
     flightNumber: 'H25021',
     origin: 'LIM',
@@ -71,7 +71,7 @@ export const MOCK_AI_COMPARISON_SCENARIO: AiComparisonScenario = {
     stopsCount: 0,
   },
   flight2: {
-    id: 'f-latam-204',
+    id: 'fl-003',
     airlineName: 'LATAM',
     flightNumber: 'LA2040',
     origin: 'LIM',

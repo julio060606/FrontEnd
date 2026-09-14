@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -16,6 +16,7 @@ import {
 import { SearchSummaryBar } from '../components/SearchSummaryBar';
 import FilterSidebar from '../components/FilterSidebar';
 import FlightCard from '../components/FlightCard';
+import ComparisonSelectionBar from '../components/ComparisonSelectionBar';
 import { flightService } from '../../../services/flightService';
 import {
   FlightItem,
@@ -25,9 +26,12 @@ import {
 } from '../../../types/flight.types';
 
 export const SearchResultsPage: React.FC = () => {
+  const maxComparisonFlights = 2;
   const navigate = useNavigate();
+  const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const [searchParams, setSearchParams] = useState<SearchQueryParams | undefined>(undefined);
   const [flights, setFlights] = useState<FlightItem[]>([]);
+  const [selectedFlights, setSelectedFlights] = useState<FlightItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<SortOption>('PRICE_ASC');
   const [filters, setFilters] = useState<FlightFilterState>({
@@ -37,6 +41,35 @@ export const SearchResultsPage: React.FC = () => {
     departureTimes: [],
   });
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const comparisonIds = [
+      urlSearchParams.get('flightA'),
+      urlSearchParams.get('flightB'),
+    ].filter((flightId): flightId is string => Boolean(flightId));
+    const uniqueComparisonIds = [...new Set(comparisonIds)].slice(0, maxComparisonFlights);
+
+    if (uniqueComparisonIds.length === 0) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const restoreComparisonSelection = async () => {
+      const restoredFlights = await flightService.getFlightsByIds(uniqueComparisonIds);
+
+      if (isMounted) {
+        setSelectedFlights(restoredFlights);
+      }
+    };
+
+    restoreComparisonSelection();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [urlSearchParams]);
 
   useEffect(() => {
     let isMounted = true;
@@ -84,6 +117,52 @@ export const SearchResultsPage: React.FC = () => {
     });
   };
 
+  const updateComparisonUrl = (selection: FlightItem[]) => {
+    const nextSearchParams = new URLSearchParams(urlSearchParams);
+    nextSearchParams.delete('flightA');
+    nextSearchParams.delete('flightB');
+
+    if (selection[0]) {
+      nextSearchParams.set('flightA', selection[0].id);
+    }
+
+    if (selection[1]) {
+      nextSearchParams.set('flightB', selection[1].id);
+    }
+
+    setUrlSearchParams(nextSearchParams, { replace: true });
+  };
+
+  const handleComparisonToggle = (flight: FlightItem) => {
+    const isAlreadySelected = selectedFlights.some((item) => item.id === flight.id);
+    const nextSelection = isAlreadySelected
+      ? selectedFlights.filter((item) => item.id !== flight.id)
+      : [...selectedFlights, flight].slice(0, maxComparisonFlights);
+
+    setSelectedFlights(nextSelection);
+    updateComparisonUrl(nextSelection);
+  };
+
+  const handleRemoveComparisonFlight = (flightId: string) => {
+    const nextSelection = selectedFlights.filter((flight) => flight.id !== flightId);
+    setSelectedFlights(nextSelection);
+    updateComparisonUrl(nextSelection);
+  };
+
+  const handleClearComparisonSelection = () => {
+    setSelectedFlights([]);
+    updateComparisonUrl([]);
+  };
+
+  const handleCompareSelectedFlights = () => {
+    if (selectedFlights.length !== maxComparisonFlights) {
+      return;
+    }
+
+    const [flightA, flightB] = selectedFlights;
+    navigate(`/compare?flightA=${encodeURIComponent(flightA.id)}&flightB=${encodeURIComponent(flightB.id)}`);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       {/* Barra de Resumen de Búsqueda */}
@@ -93,7 +172,15 @@ export const SearchResultsPage: React.FC = () => {
       />
 
       {/* Contenedor Principal: Filtros + Resultados */}
-      <Box component="main" sx={{ flexGrow: 1, py: { xs: 3, md: 4 }, px: { xs: 2, sm: 4, lg: 6 } }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          pt: { xs: 3, md: 4 },
+          pb: selectedFlights.length > 0 ? { xs: 24, md: 16 } : { xs: 3, md: 4 },
+          px: { xs: 2, sm: 4, lg: 6 },
+        }}
+      >
         <Container maxWidth="xl" disableGutters>
           {/* Botón de Filtros para vista Móvil */}
           <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2.5 }}>
@@ -156,6 +243,13 @@ export const SearchResultsPage: React.FC = () => {
                     boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.03)',
                   }}
                 >
+                  <Typography
+                    variant="caption"
+                    aria-live="polite"
+                    sx={{ color: 'primary.main', fontWeight: 700 }}
+                  >
+                    Selección para comparar: {selectedFlights.length}/{maxComparisonFlights}
+                  </Typography>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
                       Encontramos
@@ -310,6 +404,13 @@ export const SearchResultsPage: React.FC = () => {
                     <FlightCard
                       key={flight.id}
                       flight={flight}
+                      isSelectedForComparison={selectedFlights.some(
+                        (selectedFlight) => selectedFlight.id === flight.id,
+                      )}
+                      isComparisonSelectionDisabled={
+                        selectedFlights.length >= maxComparisonFlights
+                      }
+                      onComparisonToggle={handleComparisonToggle}
                       onViewDetailsClick={handleFlightDetailsClick}
                     />
                   ))
@@ -363,6 +464,13 @@ export const SearchResultsPage: React.FC = () => {
           Aplicar y Ver {flights.length} Vuelos
         </Button>
       </Drawer>
+
+      <ComparisonSelectionBar
+        selectedFlights={selectedFlights}
+        onRemoveFlight={handleRemoveComparisonFlight}
+        onClear={handleClearComparisonSelection}
+        onCompare={handleCompareSelectedFlights}
+      />
     </Box>
   );
 };

@@ -4,15 +4,22 @@ import {
   Typography,
   Stack,
   Divider,
+  LinearProgress,
+  Button,
 } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { AIRecommendation } from '../../../types/compare.types';
 
 export interface AIRecommendationBannerProps {
   recommendation: AIRecommendation;
+  isRecommendedFlightSelected?: boolean;
+  onSelectRecommended?: () => void;
 }
 
 export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
   recommendation,
+  isRecommendedFlightSelected = false,
+  onSelectRecommended,
 }) => {
   return (
     <Box
@@ -28,7 +35,7 @@ export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
         gap: { xs: 3.5, lg: 5 },
       }}
     >
-      {/* 1. Columna Izquierda: Badge IA, Título y Descripción */}
+      {/* 1. Columna Izquierda: criterio, título y puntuaciones */}
       <Stack spacing={2} sx={{ maxWidth: { lg: 340 }, width: '100%' }}>
         <Box
           sx={{
@@ -58,7 +65,7 @@ export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
               letterSpacing: '0.04em',
             }}
           >
-            RECOMENDACIÓN IA
+            RECOMENDACIÓN INTELIGENTE
           </Typography>
         </Box>
 
@@ -84,6 +91,74 @@ export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
         >
           {recommendation.description}
         </Typography>
+
+        {onSelectRecommended && (
+          <Button
+            variant={isRecommendedFlightSelected ? 'outlined' : 'contained'}
+            color="warning"
+            startIcon={<CheckCircleOutlineIcon />}
+            aria-pressed={isRecommendedFlightSelected}
+            onClick={onSelectRecommended}
+            sx={{
+              alignSelf: 'flex-start',
+              color: isRecommendedFlightSelected ? 'warning.main' : 'secondary.main',
+              borderColor: 'warning.main',
+              fontWeight: 800,
+            }}
+          >
+            {isRecommendedFlightSelected
+              ? `${recommendation.recommendedFlightNumber} elegido`
+              : `Elegir ${recommendation.recommendedFlightNumber}`}
+          </Button>
+        )}
+
+        <Stack spacing={1.5} aria-label="Puntuación de los vuelos comparados">
+          {[
+            {
+              flightNumber: recommendation.recommendedFlightNumber,
+              airlineName: recommendation.recommendedAirlineName,
+              score: recommendation.recommendedScore,
+              highlighted: true,
+            },
+            {
+              flightNumber: recommendation.alternativeFlightNumber,
+              airlineName: recommendation.alternativeAirlineName,
+              score: recommendation.alternativeScore,
+              highlighted: false,
+            },
+          ].map((flight) => (
+            <Box key={flight.flightNumber}>
+              <Stack direction="row" justifyContent="space-between" spacing={2} mb={0.5}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: '#FFFFFF', fontWeight: flight.highlighted ? 700 : 500 }}
+                >
+                  {flight.airlineName} · {flight.flightNumber}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: flight.highlighted ? 'warning.main' : '#FFFFFF', fontWeight: 800 }}
+                >
+                  {flight.score}/100
+                </Typography>
+              </Stack>
+              <LinearProgress
+                variant="determinate"
+                value={flight.score}
+                aria-label={`Puntuación de ${flight.airlineName}: ${flight.score} de 100`}
+                sx={{
+                  height: 6,
+                  borderRadius: 999,
+                  bgcolor: 'rgba(255, 255, 255, 0.14)',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 999,
+                    bgcolor: flight.highlighted ? 'warning.main' : 'rgba(255, 255, 255, 0.55)',
+                  },
+                }}
+              />
+            </Box>
+          ))}
+        </Stack>
       </Stack>
 
       {/* Divisor Vertical */}
@@ -97,8 +172,14 @@ export const AIRecommendationBanner: React.FC<AIRecommendationBannerProps> = ({
         }}
       />
 
-      {/* 2. Columna Derecha: Lista de Argumentos y Disclaimer */}
+      {/* 2. Columna Derecha: razones verificables y alcance */}
       <Stack spacing={2.5} sx={{ flex: 1, width: '100%' }}>
+        <Typography
+          variant="overline"
+          sx={{ color: 'rgba(255, 255, 255, 0.72)', fontWeight: 700, letterSpacing: '0.08em' }}
+        >
+          Por qué gana en “{recommendation.priorityLabel}”
+        </Typography>
         <Stack spacing={1.5}>
           {recommendation.reasons.map((reason) => (
             <Stack key={reason.id} direction="row" alignItems="center" spacing={1.5}>

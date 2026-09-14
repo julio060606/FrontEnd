@@ -100,9 +100,10 @@ export const Home: React.FC = () => {
     navigate('/flights');
   };
 
-  const handleCompareClick = (scenario?: AiComparisonScenario) => {
-    console.log('Comparando vuelos recomendados:', scenario);
-    navigate('/compare');
+  const handleCompareClick = (scenario: AiComparisonScenario) => {
+    navigate(
+      `/compare?flightA=${encodeURIComponent(scenario.flight1.id)}&flightB=${encodeURIComponent(scenario.flight2.id)}`,
+    );
   };
 
   return (

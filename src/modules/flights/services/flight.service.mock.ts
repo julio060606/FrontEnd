@@ -17,8 +17,8 @@ export const searchFlightsMock = async (searchParams: FlightSearchFormData): Pro
   const destCity = searchParams.destination.city;
 
   // Fecha de salida formateada (tomamos la seleccionada en el form, si no hay, la de hoy)
-  const departureDate = searchParams.departureDate 
-    ? searchParams.departureDate.toISOString().split('T')[0] 
+  const departureDate = searchParams.departureDate
+    ? searchParams.departureDate.toISOString().split('T')[0]
     : new Date().toISOString().split('T')[0];
 
   const passengers = searchParams.passengers || 1;

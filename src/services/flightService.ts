@@ -32,6 +32,18 @@ export const flightService = {
   },
 
   /**
+   * Recupera vuelos concretos conservando el orden de los identificadores.
+   * Permite restaurar una selección de comparación desde la URL.
+   */
+  async getFlightsByIds(flightIds: string[]): Promise<FlightItem[]> {
+    const flights = flightIds
+      .map((flightId) => MOCK_FLIGHT_RESULTS.find((flight) => flight.id === flightId))
+      .filter((flight): flight is FlightItem => flight !== undefined);
+
+    return USE_MOCKS ? simulateDelay(flights, 100) : flights;
+  },
+
+  /**
    * Busca y filtra vuelos según los criterios del usuario
    */
   async searchFlights(

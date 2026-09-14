@@ -7,31 +7,68 @@ import {
   Paper,
   Divider,
   Grid,
+  Chip,
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { CompareFlightCardData } from '../../../types/compare.types';
 
 export interface CompareHeaderCardsProps {
   flightA: CompareFlightCardData;
   flightB: CompareFlightCardData;
+  recommendedFlightId?: string;
+  selectedFlightId?: string;
   onSelectFlight?: (flight: CompareFlightCardData) => void;
 }
 
 export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
   flightA,
   flightB,
+  recommendedFlightId,
+  selectedFlightId,
   onSelectFlight,
 }) => {
-  const renderFlightCard = (flight: CompareFlightCardData, isA: boolean) => (
+  const formatDate = (date: string): string =>
+    new Intl.DateTimeFormat('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${date}T00:00:00Z`));
+
+  const getAirlineBadgeColor = (badgeType: CompareFlightCardData['airline']['colorBadge']) => {
+    switch (badgeType) {
+      case 'success':
+        return 'success.main';
+      case 'warning':
+        return 'warning.main';
+      case 'error':
+        return 'error.main';
+      case 'info':
+        return 'info.main';
+      case 'primary':
+      default:
+        return 'primary.main';
+    }
+  };
+
+  const renderFlightCard = (flight: CompareFlightCardData) => {
+    const isRecommended = flight.id === recommendedFlightId;
+    const isSelected = flight.id === selectedFlightId;
+
+    return (
     <Paper
       elevation={0}
+      aria-label={`${flight.airline.name} ${flight.flightNumber}${isRecommended ? ', recomendado' : ''}${isSelected ? ', elegido' : ''}`}
       sx={{
         height: '100%',
         p: { xs: 2.5, sm: 3 },
         bgcolor: 'background.paper',
         borderRadius: 4,
-        border: 1,
-        borderColor: 'divider',
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+        border: isSelected ? 2 : 1,
+        borderColor: isSelected ? 'success.main' : isRecommended ? 'primary.main' : 'divider',
+        boxShadow: isSelected
+          ? '0px 6px 24px rgba(16, 185, 129, 0.18)'
+          : '0px 4px 20px rgba(0, 0, 0, 0.05)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -39,13 +76,13 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
       }}
     >
       {/* 1. Header: Aerolínea & Tag de Ruta */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
             sx={{
               width: 40,
               height: 40,
-              bgcolor: isA ? 'success.main' : 'primary.main',
+              bgcolor: getAirlineBadgeColor(flight.airline.colorBadge),
               borderRadius: 2,
               display: 'flex',
               alignItems: 'center',
@@ -63,17 +100,40 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
               {flight.airline.name}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-              {flight.cabinClass}
+              {flight.flightNumber} · {flight.cabinClass}
             </Typography>
           </Box>
         </Stack>
 
-        <Box sx={{ px: 1.25, py: 0.5, bgcolor: 'customBackgrounds.appBase', borderRadius: 1.5 }}>
-          <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600, fontSize: '0.75rem' }}>
-            {flight.routeLabel}
-          </Typography>
-        </Box>
+        <Stack alignItems="flex-end" spacing={0.75}>
+          <Box sx={{ px: 1.25, py: 0.5, bgcolor: 'customBackgrounds.appBase', borderRadius: 1.5 }}>
+            <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600, fontSize: '0.75rem' }}>
+              {flight.routeLabel}
+            </Typography>
+          </Box>
+          {isSelected ? (
+            <Chip
+              icon={<CheckCircleIcon />}
+              label="TU ELECCIÓN"
+              color="success"
+              size="small"
+              sx={{ fontWeight: 800, fontSize: '0.625rem' }}
+            />
+          ) : isRecommended ? (
+            <Chip
+              label="RECOMENDADO"
+              color="primary"
+              size="small"
+              sx={{ fontWeight: 800, fontSize: '0.625rem' }}
+            />
+          ) : null}
+        </Stack>
       </Stack>
+
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+        Salida: {formatDate(flight.departureDate)}
+        {flight.returnDate ? ` · Regreso: ${formatDate(flight.returnDate)}` : ''}
+      </Typography>
 
       <Divider />
 
@@ -150,36 +210,35 @@ export const CompareHeaderCards: React.FC<CompareHeaderCardsProps> = ({
         </Box>
 
         <Button
-          variant="contained"
+          variant={isSelected ? 'outlined' : 'contained'}
+          color={isSelected ? 'success' : 'secondary'}
+          aria-pressed={isSelected}
+          startIcon={isSelected ? <CheckCircleIcon /> : undefined}
           onClick={() => onSelectFlight?.(flight)}
           sx={{
-            bgcolor: 'secondary.main',
-            color: '#FFFFFF',
             fontWeight: 700,
             fontSize: '0.8125rem',
             px: 2.25,
             py: 1,
             borderRadius: 1.5,
-            '&:hover': {
-              bgcolor: 'secondary.dark',
-            },
           }}
         >
-          Elegir vuelo
+          {isSelected ? 'Vuelo elegido' : 'Elegir vuelo'}
         </Button>
       </Stack>
     </Paper>
-  );
+    );
+  };
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
       <Grid container spacing={{ xs: 3, md: 4 }} alignItems="stretch">
         <Grid item xs={12} md={6}>
-          {renderFlightCard(flightA, true)}
+          {renderFlightCard(flightA)}
         </Grid>
 
         <Grid item xs={12} md={6}>
-          {renderFlightCard(flightB, false)}
+          {renderFlightCard(flightB)}
         </Grid>
       </Grid>
 
