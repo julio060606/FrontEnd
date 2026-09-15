@@ -20,6 +20,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavLink } from 'react-router-dom';
+import logoImg from '@/assets/logo.png';
 
 export interface HeaderProps {
   onLoginClick?: () => void;
@@ -69,7 +70,18 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                 textDecoration: 'none',
               }}
             >
-              <FlightTakeoffIcon sx={{ fontSize: { xs: 30, md: 34 } }} />
+
+
+              <Box
+                component="img"
+                src={logoImg}
+                alt="ChaskyFly Logo"
+                sx={{
+                  height: { xs: 32, md: 38 },
+                  width: 'auto',
+                  objectFit: 'contain',
+                }}
+              />
               <Typography
                 variant="h6"
                 sx={{
@@ -82,6 +94,14 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
               >
                 ChaskyFly
               </Typography>
+
+
+
+
+
+
+
+
             </Box>
 
             {!isMobile && (
@@ -167,9 +187,18 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
           <Box display="flex" alignItems="center" gap={1} color="primary.main">
-            <FlightTakeoffIcon />
+            <Box
+              component="img"
+              src={logoImg}
+              alt="ChaskyFly Logo"
+              sx={{
+                height: 30,
+                width: 'auto',
+                objectFit: 'contain',
+              }}
+            />
             <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>
-              FlightTracker
+              ChaskyFly
             </Typography>
           </Box>
           <IconButton aria-label="Cerrar menú" onClick={closeDrawer}>

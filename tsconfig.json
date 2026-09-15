@@ -21,6 +21,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+
     /* Paths */
     "baseUrl": ".",
     "paths": {
@@ -28,6 +29,7 @@
         "src/*"
       ]
     }
+    
   },
   "include": [
     "src"

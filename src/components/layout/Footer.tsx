@@ -11,7 +11,6 @@ import {
   Typography,
 } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { NavLink } from 'react-router-dom';
@@ -62,9 +61,8 @@ export const Footer: React.FC = () => {
           <Grid item xs={12} md={3}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <FlightTakeoffIcon sx={{ color: '#05BFDB', fontSize: 32 }} />
                 <Typography variant="h5" sx={{ color: '#FFFFFF', fontWeight: 800 }}>
-                  FlightTracker
+                  ChaskiFly
                 </Typography>
               </Stack>
               <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.72)', lineHeight: 1.7, maxWidth: 300 }}>
