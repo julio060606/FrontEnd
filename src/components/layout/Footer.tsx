@@ -151,7 +151,7 @@ export const Footer: React.FC = () => {
 
         <Box sx={{ mt: { xs: 5, md: 7 }, pt: 3, borderTop: '1px solid rgba(255, 255, 255, 0.18)' }}>
           <Typography variant="body2" align="center" sx={{ color: 'rgba(255, 255, 255, 0.65)' }}>
-            © 2026 FlightTracker Inc. Todos los derechos reservados.
+            © 2026 ChaskiFly Todos los derechos reservados.
           </Typography>
         </Box>
       </Container>
