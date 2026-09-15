@@ -80,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                   letterSpacing: '-0.02em',
                 }}
               >
-                FlightTracker
+                ChaskyFly
               </Typography>
             </Box>
 
