@@ -59,6 +59,13 @@ export const DESIGN_TOKENS = {
     primaryLight: '#FEF1EF',
     primarySoft: '#FDE8EC',
 
+    // Brand surfaces for the remastered public layout
+    brandIvory: '#FFFCF8',
+    footerBackground: '#941A2A',
+    footerText: '#FFF9F6',
+    footerMutedText: '#E9B7BF',
+    heroOverlay: 'rgba(27, 42, 74, 0.58)',
+
     secondaryMain: '#1B2A4A', // Azul Marino / Textos principales
     secondaryDark: '#121C31',
     secondaryLight: '#2A3F6D',
