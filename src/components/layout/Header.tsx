@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   AppBar,
   Box,
   Button,
   Container,
+  Divider,
   Drawer,
   IconButton,
   List,
@@ -12,15 +13,13 @@ import {
   ListItemText,
   Stack,
   Toolbar,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavLink } from 'react-router-dom';
-import logoImg from '@/assets/logo.png';
+import chasquiFlyLogo from '@/assets/chasquifly-logo.png';
 
 export interface HeaderProps {
   onLoginClick?: () => void;
@@ -29,95 +28,94 @@ export interface HeaderProps {
 
 const navItems = [
   { label: 'Inicio', to: '/' },
-  { label: 'Buscar Vuelos', to: '/flights' },
-  { label: 'Comparar Vuelos', to: '/compare' },
+  { label: 'Buscar vuelos', to: '/flights' },
+  { label: 'Comparar vuelos', to: '/compare' },
   { label: 'Live Tracker', to: '/tracker' },
 ];
 
-export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
+export const Header = ({ onLoginClick }: HeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeDrawer = () => setMobileOpen(false);
 
-  const linkStyles = ({ isActive }: { isActive: boolean }) => ({
-    color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
-    fontWeight: isActive ? 700 : 500,
-  });
-
   return (
-    <AppBar position="sticky" color="default" elevation={1} sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
-      <Container maxWidth="xl">
+    <AppBar
+      position="sticky"
+      color="transparent"
+      elevation={0}
+      sx={{
+        bgcolor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider',
+        color: 'text.primary',
+      }}
+    >
+      <Container maxWidth="lg">
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 68, md: 80 },
+            minHeight: { xs: 68, md: 76 },
             justifyContent: 'space-between',
-            px: { xs: 2, sm: 4, lg: 8 },
+            px: { xs: 2, sm: 3, lg: 1 },
           }}
         >
-          <Stack direction="row" spacing={{ xs: 2, lg: 5 }} alignItems="center">
-            {/* Logo de la plataforma */}
+          <Stack direction="row" spacing={{ md: 4, lg: 5 }} alignItems="center">
             <Box
               component={NavLink}
               to="/"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.2,
-                color: 'primary.main',
-                textDecoration: 'none',
-              }}
+              aria-label="ChasquiFly, ir al inicio"
+              sx={{ display: 'flex', alignItems: 'center', lineHeight: 0 }}
             >
-
-
               <Box
                 component="img"
-                src={logoImg}
-                alt="ChaskyFly Logo"
+                src={chasquiFlyLogo}
+                alt="ChasquiFly"
                 sx={{
-                  height: { xs: 32, md: 38 },
+                  display: 'block',
+                  height: { xs: 42, md: 50 },
                   width: 'auto',
                   objectFit: 'contain',
                 }}
               />
-              <Typography
-                variant="h6"
-                sx={{
-                  display: { xs: 'none', sm: 'block' },
-                  fontSize: { xs: '1.15rem', md: '1.35rem' },
-                  fontWeight: 800,
-                  color: 'primary.main',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                ChaskyFly
-              </Typography>
-
-
-
-
-
-
-
-
             </Box>
 
             {!isMobile && (
-              <Stack direction="row" spacing={{ md: 2, lg: 3.5 }}>
+              <Stack component="nav" aria-label="Navegación principal" direction="row" spacing={{ md: 1.75, lg: 2.75 }}>
                 {navItems.map((item) => (
                   <Box
-                    key={item.label}
+                    key={item.to}
                     component={NavLink}
                     to={item.to}
-                    style={linkStyles}
+                    end={item.to === '/'}
                     sx={{
-                      py: 1,
+                      position: 'relative',
+                      py: 1.25,
+                      color: 'text.secondary',
+                      fontSize: { md: '0.8rem', lg: '0.875rem' },
+                      fontWeight: 500,
                       textDecoration: 'none',
-                      fontSize: { md: '0.85rem', lg: '0.9rem' },
                       transition: 'color 0.2s ease',
+                      '&::after': {
+                        position: 'absolute',
+                        right: 0,
+                        bottom: 3,
+                        left: 0,
+                        height: 2,
+                        borderRadius: 999,
+                        bgcolor: 'primary.main',
+                        content: '""',
+                        opacity: 0,
+                        transform: 'scaleX(0.4)',
+                        transition: 'opacity 0.2s ease, transform 0.2s ease',
+                      },
                       '&:hover': { color: 'primary.main' },
+                      '&.active': {
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        '&::after': { opacity: 1, transform: 'scaleX(1)' },
+                      },
                     }}
                   >
                     {item.label}
@@ -127,48 +125,31 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             )}
           </Stack>
 
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center">
             <Button
               component={NavLink}
               to="/login"
-              variant="text"
-              onClick={onLoginClick}
-              sx={{
-                display: 'inline-flex',
-                color: 'primary.main',
-                fontWeight: 600,
-                fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                textTransform: 'none',
-                '&:hover': { color: 'primary.dark', bgcolor: 'soft.primary' },
-              }}
-            >
-              Iniciar Sesión
-            </Button>
-            <Button
-              component={NavLink}
-              to="/register"
               variant="contained"
               color="primary"
+              onClick={onLoginClick}
               sx={{
-                display: 'inline-flex',
-                color: '#FFFFFF',
+                minWidth: { xs: 'auto', sm: 126 },
+                px: { xs: 1.75, sm: 2.25 },
+                py: 0.9,
+                fontSize: { xs: '0.78rem', sm: '0.84rem' },
                 fontWeight: 700,
-                fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                textTransform: 'none',
                 borderRadius: 1.5,
-                boxShadow: '0 2px 8px rgba(160, 27, 45, 0.2)',
-                '&:hover': { bgcolor: 'primary.dark' },
+                boxShadow: '0 3px 10px rgba(160, 27, 45, 0.18)',
               }}
             >
-              Registrarse
+              Iniciar sesión
             </Button>
 
             {isMobile && (
               <IconButton
-                edge="end"
                 aria-label="Abrir menú"
                 onClick={() => setMobileOpen(true)}
-                sx={{ color: 'primary.main' }}
+                sx={{ color: 'text.primary' }}
               >
                 <MenuIcon />
               </IconButton>
@@ -177,78 +158,58 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
         </Toolbar>
       </Container>
 
-      {/* Drawer Móvil */}
       <Drawer
         anchor="right"
         open={mobileOpen}
         onClose={closeDrawer}
         ModalProps={{ keepMounted: true }}
-        PaperProps={{ sx: { width: { xs: 'min(280px, 88vw)', sm: 320 }, p: 2.5 } }}
+        PaperProps={{ sx: { width: 'min(320px, 88vw)', p: 2.5, bgcolor: 'background.paper' } }}
       >
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Box display="flex" alignItems="center" gap={1} color="primary.main">
-            <Box
-              component="img"
-              src={logoImg}
-              alt="ChaskyFly Logo"
-              sx={{
-                height: 30,
-                width: 'auto',
-                objectFit: 'contain',
-              }}
-            />
-            <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>
-              ChaskyFly
-            </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
+          <Box component={NavLink} to="/" onClick={closeDrawer} sx={{ display: 'flex', lineHeight: 0 }}>
+            <Box component="img" src={chasquiFlyLogo} alt="ChasquiFly" sx={{ height: 48, width: 'auto' }} />
           </Box>
           <IconButton aria-label="Cerrar menú" onClick={closeDrawer}>
             <CloseIcon />
           </IconButton>
         </Stack>
 
-        <List>
+        <Divider />
+
+        <List component="nav" aria-label="Navegación móvil" sx={{ py: 2 }}>
           {navItems.map((item) => (
-            <ListItem key={item.label} disablePadding sx={{ mb: 1 }}>
+            <ListItem key={item.to} disablePadding sx={{ mb: 0.75 }}>
               <ListItemButton
                 component={NavLink}
                 to={item.to}
+                end={item.to === '/'}
                 onClick={closeDrawer}
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: 1.5,
                   color: 'text.primary',
-                  '&.active': { bgcolor: 'soft.primary', color: 'primary.main', fontWeight: 700 },
+                  '&.active': { bgcolor: 'soft.primary', color: 'primary.main' },
                 }}
               >
-                <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 600 }} />
+                <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 650 }} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
 
-        <Stack spacing={1.5} sx={{ mt: 3, pt: 2.5, borderTop: 1, borderColor: 'divider' }}>
+        <Box sx={{ mt: 'auto', pt: 2.5 }}>
+          <Divider sx={{ mb: 2.5 }} />
           <Button
             component={NavLink}
             to="/login"
-            variant="outlined"
-            color="primary"
-            fullWidth
-            onClick={closeDrawer}
-            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5 }}
-          >
-            Iniciar Sesión
-          </Button>
-          <Button
-            component={NavLink}
-            to="/register"
             variant="contained"
             color="primary"
             fullWidth
             onClick={closeDrawer}
-            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5 }}
+            sx={{ fontWeight: 700, borderRadius: 1.5 }}
           >
-            Registrarse
+            Iniciar sesión
           </Button>
-        </Stack>
+        </Box>
       </Drawer>
     </AppBar>
   );
