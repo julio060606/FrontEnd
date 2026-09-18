@@ -50,10 +50,10 @@ export const HeroSection = ({ onSearch, originInputRef }: HeroSectionProps) => {
     >
       <Container maxWidth="lg" disableGutters>
         <Typography id="hero-heading" component="h1" sx={visuallyHiddenStyles}>
-          Encuentra el mejor vuelo para tu próximo viaje
+          Vuela con la confianza de elegir mejor
         </Typography>
         <Typography component="p" sx={visuallyHiddenStyles}>
-          Compara vuelos de diferentes aerolíneas y encuentra la mejor opción para tu viaje.
+          Comparamos rutas, horarios y tarifas para que tomes la mejor decisión en cada etapa de tu viaje.
         </Typography>
 
         <Box

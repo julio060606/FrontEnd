@@ -111,7 +111,7 @@ export const Footer = () => {
                       textTransform: 'uppercase',
                     }}
                   >
-                    Tu viaje, siempre en ruta
+                    Tu mejor aliado en cada vuelo
                   </Typography>
                 </Stack>
               </Box>
@@ -119,7 +119,7 @@ export const Footer = () => {
                 variant="body2"
                 sx={{ color: DESIGN_TOKENS.colors.footerMutedText, lineHeight: 1.65, maxWidth: 320, fontSize: '0.8125rem' }}
               >
-                El comparador de vuelos preferido por los peruanos. Buscamos y comparamos en tiempo real para ofrecerte la mejor ruta al mejor precio.
+                Tu aliado para comparar, elegir y seguir cada vuelo con información clara y opciones que se adaptan a ti.
               </Typography>
               <Typography variant="caption" sx={{ color: DESIGN_TOKENS.colors.footerMutedText }}>
                 © 2026 ChasquiFly. Todos los derechos reservados.

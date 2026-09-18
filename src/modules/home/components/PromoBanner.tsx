@@ -82,22 +82,22 @@ export const PromoBanner = ({ onBannerActionClick }: PromoBannerProps) => (
         <Grid container alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
           <Grid item xs={12} md={3.25} sx={{ p: { xs: 3, md: 4 } }}>
             <Typography id="promo-heading" component="h2" sx={{ color: 'text.primary', fontSize: { xs: '1.7rem', md: '2rem' }, fontWeight: 800, lineHeight: 1.05, letterSpacing: '-0.04em' }}>
-              Tu próximo destino
+              Cada vuelo, mejor
               <Box component="span" sx={{ display: 'block', color: 'primary.main' }}>
-                te espera
+                acompañado
               </Box>
             </Typography>
             <Box sx={{ width: 48, borderTop: '2px solid', borderColor: 'primary.main', my: 1.35 }} />
             <Typography sx={{ maxWidth: 230, color: 'text.secondary', fontSize: '0.82rem', lineHeight: 1.45 }}>
-              ChasquiFly te ayuda a encontrar vuelos baratos de forma fácil y rápida.
+              Encuentra, compara y sigue tus opciones con información clara para viajar con confianza.
             </Typography>
           </Grid>
 
           <Grid item xs={12} md={5.35} sx={{ px: { xs: 3, md: 2 }, pb: { xs: 3, md: 0 } }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1.6, sm: 0 }} justifyContent="space-around">
               <Benefit icon={<SearchRoundedIcon fontSize="small" />} title="Compara" description="en segundos" />
-              <Benefit icon={<NotificationsNoneRoundedIcon fontSize="small" />} title="Alertas" description="de precios" />
-              <Benefit icon={<LocalOfferOutlinedIcon fontSize="small" />} title="Ahorra" description="en cada viaje" />
+              <Benefit icon={<NotificationsNoneRoundedIcon fontSize="small" />} title="Alertas" description="que te acompañan" />
+              <Benefit icon={<LocalOfferOutlinedIcon fontSize="small" />} title="Ahorra" description="con confianza" />
             </Stack>
             <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'center' }, mt: { xs: 2.5, md: 3 } }}>
               <Button
@@ -120,7 +120,7 @@ export const PromoBanner = ({ onBannerActionClick }: PromoBannerProps) => (
                 Chasqui<Box component="span" sx={{ color: 'primary.main' }}>Fly</Box>
               </Typography>
               <Typography sx={{ color: 'text.secondary', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.03em' }}>
-                Tu viaje, siempre en ruta
+                Tu mejor aliado en cada vuelo
               </Typography>
             </Stack>
           </Grid>
