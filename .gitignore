@@ -31,3 +31,8 @@ dist-ssr
 
 # Vite cache
 .vite
+
+# Codex generated artifacts
+.codex-build/
+.codex-finalizer/
+output/

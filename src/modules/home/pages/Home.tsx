@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import HeroSection from '../components/HeroSection';
@@ -16,6 +16,7 @@ export const Home: React.FC = () => {
   const [destinations, setDestinations] = useState<PopularDestination[]>([]);
   const [aiScenario, setAiScenario] = useState<AiComparisonScenario | undefined>(undefined);
   const [isLoadingDestinations, setIsLoadingDestinations] = useState<boolean>(true);
+  const originInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -106,11 +107,16 @@ export const Home: React.FC = () => {
     );
   };
 
+  const handlePromoSearch = () => {
+    document.getElementById('flight-search')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => originInputRef.current?.focus(), 450);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       {/* 1. Hero con Buscador Integrado (US01 + US04) */}
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSection onSearch={handleSearch} />
+        <HeroSection onSearch={handleSearch} originInputRef={originInputRef} />
 
         {/* 2. Destinos Populares en Perú */}
         <PopularDestinations
@@ -125,10 +131,8 @@ export const Home: React.FC = () => {
           onCompareClick={handleCompareClick}
         />
 
-        {/* 4. Banner Promocional de Alertas y Monitoreo */}
-        <PromoBanner
-          onBannerActionClick={() => navigate('/tracker')}
-        />
+        {/* 4. Flyer de conversión hacia el buscador */}
+        <PromoBanner onBannerActionClick={handlePromoSearch} />
       </Box>
     </Box>
   );
