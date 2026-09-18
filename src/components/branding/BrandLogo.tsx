@@ -21,7 +21,14 @@ export const BrandLogo = ({ variant }: BrandLogoProps) => (
       lineHeight: 0,
       bgcolor: '#FFFFFF',
       borderRadius: 1,
-      p: 0.35,
+      ...(variant === 'navbar'
+        ? {
+            width: { xs: 150, sm: 165, md: 196 },
+            height: logoHeights.navbar,
+            overflow: 'hidden',
+            flexShrink: 0,
+          }
+        : { p: 0.35 }),
     }}
   >
     <Box
@@ -30,11 +37,9 @@ export const BrandLogo = ({ variant }: BrandLogoProps) => (
       alt="ChasquiFly"
       sx={{
         display: 'block',
-        height: logoHeights[variant],
+        height: variant === 'navbar' ? { xs: 94, sm: 102, md: 121 } : logoHeights.auth,
         width: 'auto',
         objectFit: 'contain',
-        transform: variant === 'navbar' ? 'scale(1.2)' : 'none',
-        transformOrigin: 'center',
       }}
     />
   </Box>
