@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Paper, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FlightIcon from '@mui/icons-material/Flight';
 import { FlightSearchFormData, SearchQueryParams } from '../../../types/flight.types';
 
@@ -9,6 +10,8 @@ export interface SearchSummaryBarProps {
   searchData?: FlightSearchFormData;
   onEditSearchClick?: () => void;
   onEditClick?: () => void;
+  isSearchPersisted?: boolean;
+  onForgetSavedSearch?: () => void;
 }
 
 export const SearchSummaryBar: React.FC<SearchSummaryBarProps> = ({
@@ -16,6 +19,8 @@ export const SearchSummaryBar: React.FC<SearchSummaryBarProps> = ({
   searchData,
   onEditSearchClick,
   onEditClick,
+  isSearchPersisted = false,
+  onForgetSavedSearch,
 }) => {
   const originIata =
     searchData?.origin?.iataCode ||
@@ -123,25 +128,38 @@ export const SearchSummaryBar: React.FC<SearchSummaryBarProps> = ({
         </Box>
       </Box>
 
-      {/* Botón Modificar */}
-      <Button
-        variant="outlined"
-        startIcon={<EditIcon />}
-        onClick={handleEdit}
-        sx={{
-          color: 'primary.main',
-          borderColor: 'divider',
-          textTransform: 'none',
-          borderRadius: '8px',
-          fontWeight: 700,
-          '&:hover': {
-            bgcolor: 'soft.primary',
-            borderColor: 'primary.main',
-          },
-        }}
-      >
-        Modificar
-      </Button>
+      <Box display="flex" gap={1} flexWrap="wrap">
+        {isSearchPersisted && onForgetSavedSearch && (
+          <Button
+            variant="text"
+            color="secondary"
+            size="small"
+            startIcon={<DeleteOutlineIcon />}
+            onClick={onForgetSavedSearch}
+            sx={{ textTransform: 'none', fontWeight: 700 }}
+          >
+            Olvidar búsqueda guardada
+          </Button>
+        )}
+        <Button
+          variant="outlined"
+          startIcon={<EditIcon />}
+          onClick={handleEdit}
+          sx={{
+            color: 'primary.main',
+            borderColor: 'divider',
+            textTransform: 'none',
+            borderRadius: '8px',
+            fontWeight: 700,
+            '&:hover': {
+              bgcolor: 'soft.primary',
+              borderColor: 'primary.main',
+            },
+          }}
+        >
+          Modificar
+        </Button>
+      </Box>
     </Paper>
   );
 };

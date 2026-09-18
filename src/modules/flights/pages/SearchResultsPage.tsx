@@ -30,6 +30,7 @@ export const SearchResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const [searchParams, setSearchParams] = useState<SearchQueryParams | undefined>(undefined);
+  const [isSearchPersisted, setIsSearchPersisted] = useState<boolean>(false);
   const [flights, setFlights] = useState<FlightItem[]>([]);
   const [selectedFlights, setSelectedFlights] = useState<FlightItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -83,6 +84,7 @@ export const SearchResultsPage: React.FC = () => {
         if (isMounted) {
           setSearchParams(params);
           setFlights(results);
+          setIsSearchPersisted(flightService.hasPersistedSearch());
         }
       } catch (error) {
         console.error('Error al cargar vuelos:', error);
@@ -115,6 +117,11 @@ export const SearchResultsPage: React.FC = () => {
       airlines: [],
       departureTimes: [],
     });
+  };
+
+  const handleForgetSavedSearch = () => {
+    flightService.clearPersistedSearch();
+    setIsSearchPersisted(false);
   };
 
   const updateComparisonUrl = (selection: FlightItem[]) => {
@@ -169,6 +176,8 @@ export const SearchResultsPage: React.FC = () => {
       <SearchSummaryBar
         searchParams={searchParams}
         onEditSearchClick={() => navigate('/')}
+        isSearchPersisted={isSearchPersisted}
+        onForgetSavedSearch={handleForgetSavedSearch}
       />
 
       {/* Contenedor Principal: Filtros + Resultados */}

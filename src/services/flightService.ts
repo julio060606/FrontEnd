@@ -1,23 +1,64 @@
 import { FlightItem, FlightFilterState, SearchQueryParams, SortOption } from '../types/flight.types';
 import { MOCK_FLIGHT_RESULTS, MOCK_CURRENT_SEARCH } from '../mocks/flightsMocks';
+import { z } from 'zod';
+import { localStorageService } from './localStorageService';
 
 /**
  * Feature Toggle para alternar entre Mock Data y API REST de Spring Boot
  * Controlado mediante la variable de entorno VITE_USE_MOCKS (por defecto true en Sprint 1)
  */
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
+export const LAST_FLIGHT_SEARCH_STORAGE_KEY = 'chasquifly:last-flight-search:v1';
+
+const persistedSearchSchema = z.object({
+  version: z.literal(1),
+  params: z.object({
+    origin: z.string().min(1),
+    originIata: z.string().min(3),
+    destination: z.string().min(1),
+    destinationIata: z.string().min(3),
+    departureDate: z.string().min(1),
+    returnDate: z.string().min(1).optional(),
+    passengers: z.number().int().min(1).max(9),
+    travelClass: z.string().min(1),
+    tripType: z.enum(['ONE_WAY', 'ROUND_TRIP']).optional(),
+  }),
+});
+
+type PersistedSearch = z.infer<typeof persistedSearchSchema>;
 
 const simulateDelay = <T>(data: T, ms: number = 300): Promise<T> => {
   return new Promise((resolve) => setTimeout(() => resolve(data), ms));
 };
 
 let activeSearchParams: SearchQueryParams = { ...MOCK_CURRENT_SEARCH };
+let hasHydratedPersistedSearch = false;
+let isSearchPersisted = false;
+
+const hydratePersistedSearch = (): void => {
+  if (hasHydratedPersistedSearch) {
+    return;
+  }
+
+  const storedSearch = localStorageService.read<PersistedSearch>(
+    LAST_FLIGHT_SEARCH_STORAGE_KEY,
+    persistedSearchSchema,
+  );
+
+  if (storedSearch) {
+    activeSearchParams = { ...storedSearch.params };
+    isSearchPersisted = true;
+  }
+
+  hasHydratedPersistedSearch = true;
+};
 
 export const flightService = {
   /**
    * Obtiene el resumen de la búsqueda actual
    */
   async getCurrentSearchParams(): Promise<SearchQueryParams> {
+    hydratePersistedSearch();
     if (USE_MOCKS) {
       return simulateDelay(activeSearchParams, 100);
     }
@@ -29,6 +70,23 @@ export const flightService = {
    */
   setCurrentSearchParams(params: SearchQueryParams): void {
     activeSearchParams = { ...params };
+    hasHydratedPersistedSearch = true;
+    isSearchPersisted = localStorageService.save<PersistedSearch>(
+      LAST_FLIGHT_SEARCH_STORAGE_KEY,
+      { version: 1, params: activeSearchParams },
+    );
+  },
+
+  clearPersistedSearch(): void {
+    localStorageService.remove(LAST_FLIGHT_SEARCH_STORAGE_KEY);
+    activeSearchParams = { ...MOCK_CURRENT_SEARCH };
+    hasHydratedPersistedSearch = true;
+    isSearchPersisted = false;
+  },
+
+  hasPersistedSearch(): boolean {
+    hydratePersistedSearch();
+    return isSearchPersisted;
   },
 
   /**
