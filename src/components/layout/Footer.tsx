@@ -12,7 +12,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { NavLink } from 'react-router-dom';
-import chasquiFlyLogo from '@/assets/chasquifly-logo.png';
+import BrandLogo from '@/components/branding/BrandLogo';
 import { DESIGN_TOKENS } from '@/theme/theme';
 
 const companyLinks = [
@@ -81,12 +81,7 @@ export const Footer = () => {
           <Grid item xs={12} md={6} lg={6}>
             <Stack spacing={1.75} alignItems="flex-start">
               <Box component={NavLink} to="/" aria-label="ChasquiFly, ir al inicio" sx={{ display: 'flex', lineHeight: 0 }}>
-                <Box
-                  component="img"
-                  src={chasquiFlyLogo}
-                  alt="ChasquiFly"
-                  sx={{ height: 52, width: 'auto', borderRadius: 1, objectFit: 'contain' }}
-                />
+                <BrandLogo variant="footer" />
               </Box>
               <Typography
                 variant="body2"

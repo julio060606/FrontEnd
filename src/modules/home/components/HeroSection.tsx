@@ -2,7 +2,7 @@ import { Box, Container, Typography } from '@mui/material';
 import FlightSearchForm from '../../flights/components/FlightSearchForm';
 import { FlightSearchFormData } from '../../../types/flight.types';
 import heroBrandPanel from '@/assets/hero-brand-panel.png';
-import heroMachuPicchu from '@/assets/hero-machu-picchu.png';
+import heroMachuPicchu from '@/assets/hero-machu-picchu-hd.jpg';
 import { DESIGN_TOKENS } from '@/theme/theme';
 
 export interface HeroSectionProps {
@@ -32,11 +32,11 @@ export const HeroSection = ({ onSearch }: HeroSectionProps) => {
         overflow: 'hidden',
         bgcolor: 'secondary.main',
         backgroundImage: `url(${heroMachuPicchu})`,
-        backgroundPosition: 'center',
+        backgroundPosition: 'center 52%',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         px: { xs: 2, sm: 3, md: 4 },
-        py: { xs: 4, sm: 5, md: 7 },
+        py: { xs: 4, sm: 5, md: 7.5 },
         '&::before': {
           position: 'absolute',
           zIndex: -1,
@@ -62,6 +62,7 @@ export const HeroSection = ({ onSearch }: HeroSectionProps) => {
             display: 'block',
             width: '100%',
             maxWidth: 1120,
+            aspectRatio: '1600 / 396',
             height: 'auto',
             mx: 'auto',
             objectFit: 'cover',
@@ -71,7 +72,7 @@ export const HeroSection = ({ onSearch }: HeroSectionProps) => {
           }}
         />
 
-        <Box sx={{ maxWidth: 1120, mx: 'auto', mt: { xs: 3, md: 3.5 } }}>
+        <Box sx={{ maxWidth: 1120, mx: 'auto', mt: { xs: 3, md: 4 } }}>
           <FlightSearchForm onSearchSubmit={onSearch} />
         </Box>
       </Container>

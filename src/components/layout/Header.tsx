@@ -19,7 +19,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavLink } from 'react-router-dom';
-import chasquiFlyLogo from '@/assets/chasquifly-logo.png';
+import BrandLogo from '@/components/branding/BrandLogo';
 
 export interface HeaderProps {
   onLoginClick?: () => void;
@@ -68,17 +68,7 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
               aria-label="ChasquiFly, ir al inicio"
               sx={{ display: 'flex', alignItems: 'center', lineHeight: 0 }}
             >
-              <Box
-                component="img"
-                src={chasquiFlyLogo}
-                alt="ChasquiFly"
-                sx={{
-                  display: 'block',
-                  height: { xs: 42, md: 50 },
-                  width: 'auto',
-                  objectFit: 'contain',
-                }}
-              />
+              <BrandLogo variant="navbar" />
             </Box>
 
             {!isMobile && (
@@ -129,20 +119,35 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
             <Button
               component={NavLink}
               to="/login"
-              variant="contained"
-              color="primary"
+              variant="text"
               onClick={onLoginClick}
               sx={{
-                minWidth: { xs: 'auto', sm: 126 },
-                px: { xs: 1.75, sm: 2.25 },
+                display: { xs: 'none', md: 'inline-flex' },
+                color: 'text.primary',
+                fontSize: '0.84rem',
+                fontWeight: 600,
+                '&:hover': { bgcolor: 'soft.primary', color: 'primary.main' },
+              }}
+            >
+              Iniciar sesión
+            </Button>
+
+            <Button
+              component={NavLink}
+              to="/register"
+              variant="contained"
+              color="primary"
+              sx={{
+                minWidth: { xs: 104, sm: 118 },
+                px: { xs: 1.5, sm: 2 },
                 py: 0.9,
-                fontSize: { xs: '0.78rem', sm: '0.84rem' },
+                fontSize: { xs: '0.75rem', sm: '0.84rem' },
                 fontWeight: 700,
                 borderRadius: 1.5,
                 boxShadow: '0 3px 10px rgba(160, 27, 45, 0.18)',
               }}
             >
-              Iniciar sesión
+              Registrarse
             </Button>
 
             {isMobile && (
@@ -167,7 +172,7 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
           <Box component={NavLink} to="/" onClick={closeDrawer} sx={{ display: 'flex', lineHeight: 0 }}>
-            <Box component="img" src={chasquiFlyLogo} alt="ChasquiFly" sx={{ height: 48, width: 'auto' }} />
+            <BrandLogo variant="navbar" />
           </Box>
           <IconButton aria-label="Cerrar menú" onClick={closeDrawer}>
             <CloseIcon />
@@ -201,13 +206,24 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
           <Button
             component={NavLink}
             to="/login"
-            variant="contained"
+            variant="outlined"
             color="primary"
             fullWidth
             onClick={closeDrawer}
             sx={{ fontWeight: 700, borderRadius: 1.5 }}
           >
             Iniciar sesión
+          </Button>
+          <Button
+            component={NavLink}
+            to="/register"
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={closeDrawer}
+            sx={{ mt: 1.25, fontWeight: 700, borderRadius: 1.5 }}
+          >
+            Registrarse
           </Button>
         </Box>
       </Drawer>

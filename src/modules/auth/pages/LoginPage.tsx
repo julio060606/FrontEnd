@@ -12,6 +12,7 @@ import {
 import LoginForm from "../components/LoginForm";
 import SocialLoginButtons from "../components/SocialLoginButtons";
 import { AuthResponse } from "../../../types/auth.types";
+import BrandLogo from "@/components/branding/BrandLogo";
 
 export interface LoginPageProps {
   onLoginSuccess?: (authData: AuthResponse) => void;
@@ -93,56 +94,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               alignItems="center"
               sx={{ textAlign: "center" }}
             >
-              <Box
-                component="a"
-                href="#"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  textDecoration: "none",
-                  gap: 1,
-                  mb: 1,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    bgcolor: "primary.main",
-                    borderRadius: 1.5,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#FFFFFF",
-                  }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z" />
-                  </svg>
-                </Box>
-                <Typography
-                  variant="h3"
-                  sx={{
-                    fontWeight: 800,
-                    color: "secondary.main",
-                    letterSpacing: "-0.02em",
-                    fontSize: "1.35rem",
-                  }}
-                >
-                  Chasqui
-                  <Box component="span" sx={{ color: "primary.main" }}>
-                    Fly
-                  </Box>
-                </Typography>
+              <Box component={RouterLink} to="/" aria-label="ChasquiFly, ir al inicio" sx={{ display: "flex", textDecoration: "none", mb: 1 }}>
+                <BrandLogo variant="auth" />
               </Box>
 
               <Typography
