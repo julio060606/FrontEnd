@@ -1,157 +1,140 @@
-import React, { FormEvent, useState } from 'react';
 import {
   Box,
-  Button,
   Container,
+  Divider,
   Grid,
   IconButton,
   Link,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { NavLink } from 'react-router-dom';
+import chasquiFlyLogo from '@/assets/chasquifly-logo.png';
+import { DESIGN_TOKENS } from '@/theme/theme';
 
-const quickLinks = [
-  { label: 'Inicio', to: '/' },
-  { label: 'Comparar', to: '/compare' },
-  { label: 'Estado', to: '/status' },
-  { label: 'Live Tracker', to: '/tracker' },
+const companyLinks = [
+  { label: 'Nosotros', href: '#nosotros' },
+  { label: 'Socios', href: '#socios' },
+  { label: 'Prensa', href: '#prensa' },
 ];
 
 const supportLinks = [
-  { label: 'Centro de Ayuda', href: '#ayuda' },
-  { label: 'Términos y Condiciones', href: '#terminos' },
-  { label: 'Políticas de Privacidad', href: '#privacidad' },
-  { label: 'Libro de Reclamaciones', href: '#reclamaciones' },
+  { label: 'Centro de ayuda', href: '#ayuda' },
+  { label: 'Reclamaciones', href: '#reclamaciones' },
+  { label: 'Contacto', href: '#contacto' },
 ];
 
-const linkSx = {
-  color: 'rgba(255, 255, 255, 0.72)',
-  fontSize: '0.9rem',
+const legalLinks = [
+  { label: 'Privacidad', href: '#privacidad' },
+  { label: 'Términos', href: '#terminos' },
+  { label: 'Cookies', href: '#cookies' },
+];
+
+const footerLinkSx = {
+  color: DESIGN_TOKENS.colors.footerMutedText,
+  fontSize: '0.8125rem',
+  lineHeight: 1.5,
   textDecoration: 'none',
   transition: 'color 0.2s ease',
-  '&:hover': { color: '#05BFDB' },
+  '&:hover': { color: DESIGN_TOKENS.colors.footerText },
+  '&:focus-visible': {
+    outline: `2px solid ${DESIGN_TOKENS.colors.footerText}`,
+    outlineOffset: 3,
+  },
 };
 
-export const Footer: React.FC = () => {
-  const [email, setEmail] = useState('');
+interface FooterLinkGroupProps {
+  title: string;
+  links: ReadonlyArray<{ label: string; href: string }>;
+}
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setEmail('');
-  };
+const FooterLinkGroup = ({ title, links }: FooterLinkGroupProps) => (
+  <Stack spacing={1.1}>
+    <Typography variant="subtitle2" sx={{ color: 'common.white', fontWeight: 700, mb: 0.4 }}>
+      {title}
+    </Typography>
+    {links.map((link) => (
+      <Link key={link.label} href={link.href} sx={footerLinkSx}>
+        {link.label}
+      </Link>
+    ))}
+  </Stack>
+);
 
+export const Footer = () => {
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: '#1B2A4A',
-        color: '#FFFFFF',
-        pt: { xs: 6, md: 8 },
-        pb: 3,
-        px: { xs: 2, sm: 4 },
+        bgcolor: DESIGN_TOKENS.colors.footerBackground,
+        color: DESIGN_TOKENS.colors.footerText,
+        pt: { xs: 5, md: 7 },
+        pb: 2.5,
+        px: { xs: 2, sm: 3 },
       }}
     >
-      <Container maxWidth="xl">
-        <Grid container spacing={{ xs: 5, md: 4 }}>
-          <Grid item xs={12} md={3}>
-            <Stack spacing={2}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="h5" sx={{ color: '#FFFFFF', fontWeight: 800 }}>
-                  ChaskiFly
-                </Typography>
-              </Stack>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.72)', lineHeight: 1.7, maxWidth: 300 }}>
-                Compara vuelos, encuentra las mejores rutas y sigue tu viaje en tiempo real.
-              </Typography>
-              <Stack direction="row" spacing={0.5}>
-                <IconButton aria-label="Facebook" href="#facebook" sx={{ color: '#FFFFFF', '&:hover': { color: '#05BFDB' } }}>
-                  <FacebookIcon />
-                </IconButton>
-                <IconButton aria-label="Instagram" href="#instagram" sx={{ color: '#FFFFFF', '&:hover': { color: '#05BFDB' } }}>
-                  <InstagramIcon />
-                </IconButton>
-                <IconButton aria-label="Twitter" href="#twitter" sx={{ color: '#FFFFFF', '&:hover': { color: '#05BFDB' } }}>
-                  <TwitterIcon />
-                </IconButton>
-              </Stack>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 700, mb: 2 }}>
-              Links Rápidos
-            </Typography>
-            <Stack spacing={1.25}>
-              {quickLinks.map((link) => (
-                <Link key={link.label} component={NavLink} to={link.to} sx={linkSx}>
-                  {link.label}
-                </Link>
-              ))}
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 700, mb: 2 }}>
-              Legal &amp; Soporte
-            </Typography>
-            <Stack spacing={1.25}>
-              {supportLinks.map((link) => (
-                <Link key={link.label} href={link.href} sx={linkSx}>
-                  {link.label}
-                </Link>
-              ))}
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <Typography variant="h6" sx={{ color: '#FFFFFF', fontWeight: 700, mb: 1.5 }}>
-              Newsletter
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.72)', mb: 2, lineHeight: 1.6 }}>
-              Recibe novedades y ofertas de vuelos directamente en tu correo.
-            </Typography>
-            <Stack component="form" spacing={1.25} onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                type="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="Tu correo electrónico"
-                aria-label="Correo electrónico para newsletter"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    color: '#FFFFFF',
-                    bgcolor: 'rgba(255, 255, 255, 0.08)',
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.35)' },
-                    '&:hover fieldset': { borderColor: '#05BFDB' },
-                    '&.Mui-focused fieldset': { borderColor: '#05BFDB' },
-                  },
-                  '& input::placeholder': { color: 'rgba(255, 255, 255, 0.62)', opacity: 1 },
-                }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ bgcolor: '#05BFDB', color: '#063B50', fontWeight: 700, '&:hover': { bgcolor: '#04A8C1' } }}
+      <Container maxWidth="lg">
+        <Grid container columnSpacing={{ xs: 3, md: 5 }} rowSpacing={{ xs: 4, md: 3 }}>
+          <Grid item xs={12} md={6} lg={6}>
+            <Stack spacing={1.75} alignItems="flex-start">
+              <Box component={NavLink} to="/" aria-label="ChasquiFly, ir al inicio" sx={{ display: 'flex', lineHeight: 0 }}>
+                <Box
+                  component="img"
+                  src={chasquiFlyLogo}
+                  alt="ChasquiFly"
+                  sx={{ height: 52, width: 'auto', borderRadius: 1, objectFit: 'contain' }}
+                />
+              </Box>
+              <Typography
+                variant="body2"
+                sx={{ color: DESIGN_TOKENS.colors.footerMutedText, lineHeight: 1.65, maxWidth: 320, fontSize: '0.8125rem' }}
               >
-                Suscribirse
-              </Button>
+                El comparador de vuelos preferido por los peruanos. Buscamos y comparamos en tiempo real para ofrecerte la mejor ruta al mejor precio.
+              </Typography>
+              <Typography variant="caption" sx={{ color: DESIGN_TOKENS.colors.footerMutedText }}>
+                © 2026 ChasquiFly. Todos los derechos reservados.
+              </Typography>
             </Stack>
+          </Grid>
+
+          <Grid item xs={6} sm={4} md={2} lg={2}>
+            <FooterLinkGroup title="Compañía" links={companyLinks} />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2} lg={2}>
+            <FooterLinkGroup title="Soporte" links={supportLinks} />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2} lg={2}>
+            <FooterLinkGroup title="Legal" links={legalLinks} />
           </Grid>
         </Grid>
 
-        <Box sx={{ mt: { xs: 5, md: 7 }, pt: 3, borderTop: '1px solid rgba(255, 255, 255, 0.18)' }}>
-          <Typography variant="body2" align="center" sx={{ color: 'rgba(255, 255, 255, 0.65)' }}>
-            © 2026 ChaskiFly Todos los derechos reservados.
+        <Divider sx={{ mt: { xs: 4, md: 5 }, borderColor: 'rgba(255, 249, 246, 0.2)' }} />
+
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          spacing={1.5}
+          sx={{ pt: 2.25 }}
+        >
+          <Typography variant="caption" sx={{ color: DESIGN_TOKENS.colors.footerMutedText }}>
+            Tu viaje, siempre en ruta.
           </Typography>
-        </Box>
+          <Stack direction="row" spacing={0.25}>
+            <IconButton aria-label="Facebook" href="#facebook" size="small" sx={{ color: DESIGN_TOKENS.colors.footerMutedText, '&:hover': { color: 'common.white' } }}>
+              <FacebookIcon fontSize="small" />
+            </IconButton>
+            <IconButton aria-label="Twitter" href="#twitter" size="small" sx={{ color: DESIGN_TOKENS.colors.footerMutedText, '&:hover': { color: 'common.white' } }}>
+              <TwitterIcon fontSize="small" />
+            </IconButton>
+            <IconButton aria-label="Instagram" href="#instagram" size="small" sx={{ color: DESIGN_TOKENS.colors.footerMutedText, '&:hover': { color: 'common.white' } }}>
+              <InstagramIcon fontSize="small" />
+            </IconButton>
+          </Stack>
+        </Stack>
       </Container>
     </Box>
   );
