@@ -1,4 +1,5 @@
 import { Box, Container, Typography } from '@mui/material';
+import { keyframes } from '@mui/material/styles';
 import type { RefObject } from 'react';
 import FlightSearchForm from '../../flights/components/FlightSearchForm';
 import { FlightSearchFormData } from '../../../types/flight.types';
@@ -22,6 +23,28 @@ const visuallyHiddenStyles = {
   whiteSpace: 'nowrap',
   border: 0,
 } as const;
+
+const panelEntrance = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const searchFormEntrance = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export const HeroSection = ({ onSearch, originInputRef }: HeroSectionProps) => {
   return (
@@ -82,10 +105,26 @@ export const HeroSection = ({ onSearch, originInputRef }: HeroSectionProps) => {
             objectPosition: 'center',
             borderRadius: { xs: 3, md: 5 },
             boxShadow: '0 16px 38px rgba(0, 0, 0, 0.22)',
+            animation: `${panelEntrance} 480ms cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+            },
           }}
         />
 
-        <Box id="flight-search" tabIndex={-1} sx={{ maxWidth: 1120, mx: 'auto', mt: { xs: 3, md: 4 } }}>
+        <Box
+          id="flight-search"
+          tabIndex={-1}
+          sx={{
+            maxWidth: 1120,
+            mx: 'auto',
+            mt: { xs: 3, md: 4 },
+            animation: `${searchFormEntrance} 440ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both`,
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+            },
+          }}
+        >
           <FlightSearchForm onSearchSubmit={onSearch} originInputRef={originInputRef} />
         </Box>
       </Container>
