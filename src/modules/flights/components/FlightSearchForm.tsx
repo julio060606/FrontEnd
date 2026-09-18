@@ -119,12 +119,14 @@ export interface FlightSearchFormProps {
   onSearchSubmit?: (data: FlightSearchFormData) => void;
   defaultOrigin?: Airport | null;
   defaultDestination?: Airport | null;
+  originInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
   onSearchSubmit,
   defaultOrigin = MOCK_AIRPORTS[0], // Lima (LIM)
   defaultDestination = MOCK_AIRPORTS[1], // Cusco (CUZ)
+  originInputRef,
 }) => {
   const navigate = useNavigate();
 
@@ -336,6 +338,7 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
                       <TextField
                         {...params}
                         label="Origen"
+                        inputRef={originInputRef}
                         error={!!errors.origin}
                         helperText={errors.origin?.message}
                         InputProps={{

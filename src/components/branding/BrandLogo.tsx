@@ -1,15 +1,14 @@
 import { Box } from '@mui/material';
 import chasquiFlyLogo from '@/assets/chasquifly-logo.png';
 
-export type BrandLogoVariant = 'navbar' | 'footer' | 'auth';
+export type BrandLogoVariant = 'navbar' | 'auth';
 
 export interface BrandLogoProps {
   variant: BrandLogoVariant;
 }
 
 const logoHeights: Record<BrandLogoVariant, { xs: number; sm: number; md: number }> = {
-  navbar: { xs: 44, sm: 48, md: 54 },
-  footer: { xs: 62, sm: 68, md: 74 },
+  navbar: { xs: 48, sm: 54, md: 62 },
   auth: { xs: 76, sm: 84, md: 88 },
 };
 

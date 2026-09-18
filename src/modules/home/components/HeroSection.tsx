@@ -1,4 +1,5 @@
 import { Box, Container, Typography } from '@mui/material';
+import type { RefObject } from 'react';
 import FlightSearchForm from '../../flights/components/FlightSearchForm';
 import { FlightSearchFormData } from '../../../types/flight.types';
 import heroBrandPanel from '@/assets/hero-brand-panel.png';
@@ -7,6 +8,7 @@ import { DESIGN_TOKENS } from '@/theme/theme';
 
 export interface HeroSectionProps {
   onSearch?: (searchValues: FlightSearchFormData) => void;
+  originInputRef?: RefObject<HTMLInputElement>;
 }
 
 const visuallyHiddenStyles = {
@@ -21,7 +23,7 @@ const visuallyHiddenStyles = {
   border: 0,
 } as const;
 
-export const HeroSection = ({ onSearch }: HeroSectionProps) => {
+export const HeroSection = ({ onSearch, originInputRef }: HeroSectionProps) => {
   return (
     <Box
       component="section"
@@ -72,8 +74,8 @@ export const HeroSection = ({ onSearch }: HeroSectionProps) => {
           }}
         />
 
-        <Box sx={{ maxWidth: 1120, mx: 'auto', mt: { xs: 3, md: 4 } }}>
-          <FlightSearchForm onSearchSubmit={onSearch} />
+        <Box id="flight-search" tabIndex={-1} sx={{ maxWidth: 1120, mx: 'auto', mt: { xs: 3, md: 4 } }}>
+          <FlightSearchForm onSearchSubmit={onSearch} originInputRef={originInputRef} />
         </Box>
       </Container>
     </Box>

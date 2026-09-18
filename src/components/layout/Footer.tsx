@@ -12,7 +12,6 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { NavLink } from 'react-router-dom';
-import BrandLogo from '@/components/branding/BrandLogo';
 import { DESIGN_TOKENS } from '@/theme/theme';
 
 const companyLinks = [
@@ -80,8 +79,41 @@ export const Footer = () => {
         <Grid container columnSpacing={{ xs: 3, md: 5 }} rowSpacing={{ xs: 4, md: 3 }}>
           <Grid item xs={12} md={6} lg={6}>
             <Stack spacing={1.75} alignItems="flex-start">
-              <Box component={NavLink} to="/" aria-label="ChasquiFly, ir al inicio" sx={{ display: 'flex', lineHeight: 0 }}>
-                <BrandLogo variant="footer" />
+              <Box
+                component={NavLink}
+                to="/"
+                aria-label="ChasquiFly, ir al inicio"
+                sx={{ display: 'inline-flex', textDecoration: 'none' }}
+              >
+                <Stack spacing={0.4}>
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: DESIGN_TOKENS.colors.footerText,
+                      fontSize: { xs: '2rem', sm: '2.25rem' },
+                      fontWeight: 800,
+                      letterSpacing: '-0.055em',
+                      lineHeight: 0.95,
+                    }}
+                  >
+                    Chasqui
+                    <Box component="span" sx={{ color: '#E8C27D' }}>
+                      Fly
+                    </Box>
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: '#F7DFAF',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Tu viaje, siempre en ruta
+                  </Typography>
+                </Stack>
               </Box>
               <Typography
                 variant="body2"
@@ -116,7 +148,7 @@ export const Footer = () => {
           sx={{ pt: 2.25 }}
         >
           <Typography variant="caption" sx={{ color: DESIGN_TOKENS.colors.footerMutedText }}>
-            Tu viaje, siempre en ruta.
+            Vuela informado, viaja mejor.
           </Typography>
           <Stack direction="row" spacing={0.25}>
             <IconButton aria-label="Facebook" href="#facebook" size="small" sx={{ color: DESIGN_TOKENS.colors.footerMutedText, '&:hover': { color: 'common.white' } }}>

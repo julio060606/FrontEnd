@@ -56,12 +56,12 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 68, md: 76 },
+            minHeight: { xs: 74, md: 88 },
             justifyContent: 'space-between',
             px: { xs: 2, sm: 3, lg: 1 },
           }}
         >
-          <Stack direction="row" spacing={{ md: 4, lg: 5 }} alignItems="center">
+          <Stack direction="row" spacing={{ md: 3, lg: 4 }} alignItems="center">
             <Box
               component={NavLink}
               to="/"
