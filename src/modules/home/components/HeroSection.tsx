@@ -46,6 +46,17 @@ export const HeroSection = ({ onSearch, originInputRef }: HeroSectionProps) => {
           bgcolor: DESIGN_TOKENS.colors.heroOverlay,
           content: '""',
         },
+        '&::after': {
+          position: 'absolute',
+          zIndex: -1,
+          inset: 0,
+          pointerEvents: 'none',
+          background: `
+            radial-gradient(circle at 8% 13%, rgba(255, 226, 162, 0.72) 0%, rgba(244, 184, 79, 0.38) 13%, rgba(211, 132, 38, 0.14) 27%, transparent 48%),
+            linear-gradient(112deg, rgba(255, 202, 112, 0.2) 0%, rgba(255, 187, 77, 0.08) 22%, transparent 47%)
+          `,
+          content: '""',
+        },
       }}
     >
       <Container maxWidth="lg" disableGutters>

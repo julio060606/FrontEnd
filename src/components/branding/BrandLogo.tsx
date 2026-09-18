@@ -8,7 +8,7 @@ export interface BrandLogoProps {
 }
 
 const logoHeights: Record<BrandLogoVariant, { xs: number; sm: number; md: number }> = {
-  navbar: { xs: 48, sm: 54, md: 62 },
+  navbar: { xs: 58, sm: 64, md: 76 },
   auth: { xs: 76, sm: 84, md: 88 },
 };
 
@@ -33,6 +33,8 @@ export const BrandLogo = ({ variant }: BrandLogoProps) => (
         height: logoHeights[variant],
         width: 'auto',
         objectFit: 'contain',
+        transform: variant === 'navbar' ? 'scale(1.2)' : 'none',
+        transformOrigin: 'center',
       }}
     />
   </Box>

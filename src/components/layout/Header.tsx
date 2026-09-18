@@ -56,7 +56,7 @@ export const Header = ({ onLoginClick }: HeaderProps) => {
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 74, md: 88 },
+            minHeight: { xs: 84, md: 98 },
             justifyContent: 'space-between',
             px: { xs: 2, sm: 3, lg: 1 },
           }}
