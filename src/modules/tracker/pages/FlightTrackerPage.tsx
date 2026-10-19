@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -8,7 +9,9 @@ import {
   Skeleton,
   Snackbar,
   Alert,
+  Paper,
 } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FlightTrackerSearch from '../components/FlightTrackerSearch';
 import FlightStatusBanner from '../components/FlightStatusBanner';
 import FlightTimelineProgressBar from '../components/FlightTimelineProgressBar';
@@ -19,12 +22,16 @@ import { trackerService } from '../../../services/trackerService';
 import { FlightTrackDetail } from '../../../types/tracker.types';
 
 export const FlightTrackerPage: React.FC = () => {
+  const { flightId: routeFlightId } = useParams<{ flightId: string }>();
   const [flightData, setFlightData] = useState<FlightTrackDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
-  const fetchTrackData = async (flightNum: string = 'LA 2045', date: string = '15 Sep 2025') => {
+  const fetchTrackData = async (
+    flightNum: string = routeFlightId || 'LA2010',
+    date: string = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })
+  ) => {
     try {
       setIsLoading(true);
       const data = await trackerService.trackFlight(flightNum, date);
@@ -38,15 +45,15 @@ export const FlightTrackerPage: React.FC = () => {
 
   useEffect(() => {
     fetchTrackData();
-  }, []);
+  }, [routeFlightId]);
 
   const handleSearch = (flightNumber: string, date: string) => {
     fetchTrackData(flightNumber, date);
-    setSnackbarMessage(`Buscando telemetría para el vuelo ${flightNumber}`);
+    setSnackbarMessage(`Consultando telemetría para el vuelo ${flightNumber}`);
     setSnackbarOpen(true);
   };
 
-  const handleNotificationsChange = (newSettings: any) => {
+  const handleNotificationsChange = () => {
     setSnackbarMessage('Preferencias de alerta actualizadas correctamente');
     setSnackbarOpen(true);
   };
@@ -67,15 +74,19 @@ export const FlightTrackerPage: React.FC = () => {
                   fontSize: { xs: '1.75rem', md: '2rem' },
                 }}
               >
-                Seguimiento de vuelo
+                Seguimiento de vuelo en tiempo real
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1rem', mt: 0.5 }}>
-                Consulta el estado de tu vuelo y telemetría en tiempo real
+                Telemetría en vivo, estado de puertas de embarque y cronología de vuelo
               </Typography>
             </Box>
 
             {/* Buscador de Vuelo */}
-            <FlightTrackerSearch onSearch={handleSearch} isLoading={isLoading} />
+            <FlightTrackerSearch
+              initialFlightNumber={routeFlightId || 'LA2010'}
+              onSearch={handleSearch}
+              isLoading={isLoading}
+            />
 
             {isLoading || !flightData ? (
               <Stack spacing={3}>
@@ -93,6 +104,32 @@ export const FlightTrackerPage: React.FC = () => {
               </Stack>
             ) : (
               <Stack spacing={3.5}>
+                {/* Banner Informativo si el vuelo está programado a futuro */}
+                {flightData.isUpcoming && (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.5,
+                      bgcolor: 'rgba(2, 132, 199, 0.08)',
+                      border: '1px solid rgba(2, 132, 199, 0.3)',
+                      borderRadius: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <AccessTimeIcon sx={{ color: '#0284c7', fontSize: 36, flexShrink: 0 }} />
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ color: '#0369a1', fontWeight: 800 }}>
+                        Vuelo Programado ({flightData.timeUntilDeparture})
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
+                        Tu vuelo {flightData.flightNumber} ({flightData.originIata} ➔ {flightData.destinationIata}) saldrá el <strong>{flightData.dateFormatted}</strong> a las <strong>{flightData.scheduledDepartureTime}</strong>. La aeronave se encuentra actualmente en tierra en {flightData.originAirportName}.
+                      </Typography>
+                    </Box>
+                  </Paper>
+                )}
+
                 {/* Banner de Estado en Vivo */}
                 <FlightStatusBanner flight={flightData} />
 
@@ -138,7 +175,7 @@ export const FlightTrackerPage: React.FC = () => {
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
-          severity="success"
+          severity="info"
           variant="filled"
           sx={{ width: '100%', borderRadius: 2, fontWeight: 600 }}
         >

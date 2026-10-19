@@ -24,6 +24,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import { Airport, FlightSearchFormData } from '../../../types/flight.types';
 import { flightService } from '../../../services/flightService';
+import { homeService } from '../../../services/homeService';
 
 // Catálogo de Aeropuertos para el Autocomplete
 export const MOCK_AIRPORTS: Airport[] = [
@@ -129,6 +130,17 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
   originInputRef,
 }) => {
   const navigate = useNavigate();
+  const [airports, setAirports] = React.useState<Airport[]>(MOCK_AIRPORTS);
+
+  React.useEffect(() => {
+    homeService.getAirports().then((data) => {
+      if (data && data.length > 0) {
+        setAirports(data as Airport[]);
+      }
+    }).catch((err) => {
+      console.warn('Usando catálogo local de aeropuertos:', err);
+    });
+  }, []);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -160,12 +172,12 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
   const onSubmit = (data: FlightSearchFormData) => {
     if (!data.origin || !data.destination) return;
 
-    const depFormatted = data.departureDate
-      ? data.departureDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
-      : '15 Sep';
+    const depIso = data.departureDate
+      ? data.departureDate.toISOString().split('T')[0]
+      : '2026-10-19';
 
-    const retFormatted = data.returnDate
-      ? data.returnDate.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })
+    const retIso = data.returnDate
+      ? data.returnDate.toISOString().split('T')[0]
       : undefined;
 
     // Actualizar el estado global del servicio de vuelos para que SearchResultsPage lo tome
@@ -174,8 +186,8 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
       originIata: data.origin.iataCode,
       destination: data.destination.city,
       destinationIata: data.destination.iataCode,
-      departureDate: depFormatted,
-      returnDate: data.tripType === 'ROUND_TRIP' ? retFormatted : undefined,
+      departureDate: depIso,
+      returnDate: data.tripType === 'ROUND_TRIP' ? retIso : undefined,
       passengers: data.passengers,
       travelClass: data.travelClass === 'ECONOMY' ? 'Económica' : data.travelClass,
       tripType: data.tripType,
@@ -329,7 +341,7 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Autocomplete
-                    options={MOCK_AIRPORTS}
+                    options={airports}
                     getOptionLabel={(option) => `${option.city} (${option.iataCode})`}
                     value={value}
                     isOptionEqualToValue={(option, val) => option.iataCode === val?.iataCode}
@@ -366,7 +378,7 @@ export const FlightSearchForm: React.FC<FlightSearchFormProps> = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Autocomplete
-                    options={MOCK_AIRPORTS}
+                    options={airports}
                     getOptionLabel={(option) => `${option.city} (${option.iataCode})`}
                     value={value}
                     isOptionEqualToValue={(option, val) => option.iataCode === val?.iataCode}

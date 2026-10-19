@@ -52,4 +52,6 @@ export interface FlightTrackDetail {
     notifyDelays: boolean;
     notifyArrival: boolean;
   };
+  isUpcoming?: boolean;
+  timeUntilDeparture?: string;
 }

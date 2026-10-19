@@ -12,12 +12,16 @@ import {
   IconButton,
   Skeleton,
   Chip,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { SearchSummaryBar } from '../components/SearchSummaryBar';
 import FilterSidebar from '../components/FilterSidebar';
 import FlightCard from '../components/FlightCard';
 import ComparisonSelectionBar from '../components/ComparisonSelectionBar';
 import { flightService } from '../../../services/flightService';
+import { tripService } from '../../../services/tripService';
+import { authService } from '../../../services/authService';
 import {
   FlightItem,
   FlightFilterState,
@@ -42,6 +46,10 @@ export const SearchResultsPage: React.FC = () => {
     departureTimes: [],
   });
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [savedTripIds, setSavedTripIds] = useState<Set<string>>(new Set());
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'warning' | 'info' | 'error'>('info');
 
   useEffect(() => {
     let isMounted = true;
@@ -102,6 +110,68 @@ export const SearchResultsPage: React.FC = () => {
     };
   }, [filters, sortBy]);
 
+  // Sincronizar vuelos guardados de Mis Viajes desde Supabase
+  useEffect(() => {
+    let isMounted = true;
+    const syncSavedTrips = async () => {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        if (isMounted) setSavedTripIds(new Set());
+        return;
+      }
+      try {
+        const trips = await tripService.getUserTrips();
+        if (isMounted) {
+          const ids = new Set<string>(
+            trips.map((t) => String(t.flight?.flightId || (t.flight as any)?.id || ''))
+          );
+          setSavedTripIds(ids);
+        }
+      } catch (e) {
+        console.warn('Error al sincronizar viajes guardados:', e);
+      }
+    };
+
+    syncSavedTrips();
+
+    const handleTripsChange = () => syncSavedTrips();
+    window.addEventListener('chasquifly:trips-change', handleTripsChange);
+    window.addEventListener('chasquifly:auth-change', handleTripsChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('chasquifly:trips-change', handleTripsChange);
+      window.removeEventListener('chasquifly:auth-change', handleTripsChange);
+    };
+  }, []);
+
+  const handleSaveFlightToTrips = async (flight: FlightItem) => {
+    const user = authService.getCurrentUser();
+    if (!user) {
+      setSnackbarMessage('Debes iniciar sesión para guardar vuelos en tu cuenta personal.');
+      setSnackbarSeverity('warning');
+      setSnackbarOpen(true);
+      window.dispatchEvent(new CustomEvent('chasquifly:open-login'));
+      return;
+    }
+
+    try {
+      await tripService.saveTrip(
+        flight.id,
+        `Vuelo guardado: ${flight.flightNumber} (${flight.originIata} ➔ ${flight.destinationIata})`
+      );
+      setSavedTripIds((prev) => new Set(prev).add(flight.id));
+      setSnackbarMessage(`¡Vuelo ${flight.flightNumber} guardado en Mis Viajes exitosamente!`);
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (err: any) {
+      console.error('Error al guardar viaje:', err);
+      setSnackbarMessage(err.message || 'Error al guardar el vuelo en Mis Viajes');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
   const handleFiltersChange = (newFilters: FlightFilterState) => {
     setFilters(newFilters);
   };
@@ -142,12 +212,49 @@ export const SearchResultsPage: React.FC = () => {
 
   const handleComparisonToggle = (flight: FlightItem) => {
     const isAlreadySelected = selectedFlights.some((item) => item.id === flight.id);
-    const nextSelection = isAlreadySelected
-      ? selectedFlights.filter((item) => item.id !== flight.id)
-      : [...selectedFlights, flight].slice(0, maxComparisonFlights);
 
+    // Si ya está seleccionado, lo deseleccionamos
+    if (isAlreadySelected) {
+      const nextSelection = selectedFlights.filter((item) => item.id !== flight.id);
+      setSelectedFlights(nextSelection);
+      updateComparisonUrl(nextSelection);
+      return;
+    }
+
+    // Validación 1: Máximo 2 opciones permitidas simultáneamente
+    if (selectedFlights.length >= maxComparisonFlights) {
+      setSnackbarMessage('Solo puedes comparar un máximo de 2 opciones simultáneamente. Deselecciona una para elegir otra.');
+      setSnackbarSeverity('warning');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // Validación 2: Coherencia de ruta (Mismo origen y mismo destino)
+    if (selectedFlights.length === 1) {
+      const first = selectedFlights[0];
+      if (
+        first.originIata.toLowerCase() !== flight.originIata.toLowerCase() ||
+        first.destinationIata.toLowerCase() !== flight.destinationIata.toLowerCase()
+      ) {
+        setSnackbarMessage(
+          `Solo puedes comparar vuelos de la misma ruta (${first.originIata} ➔ ${first.destinationIata}). No es posible comparar rutas distintas.`
+        );
+        setSnackbarSeverity('warning');
+        setSnackbarOpen(true);
+        return;
+      }
+    }
+
+    const nextSelection = [...selectedFlights, flight];
     setSelectedFlights(nextSelection);
     updateComparisonUrl(nextSelection);
+    setSnackbarMessage(
+      nextSelection.length === 2
+        ? '¡Tus dos vuelos están listos para ser comparados!'
+        : `Vuelo ${flight.flightNumber} agregado a la comparación. Selecciona uno más de la misma ruta.`
+    );
+    setSnackbarSeverity('info');
+    setSnackbarOpen(true);
   };
 
   const handleRemoveComparisonFlight = (flightId: string) => {
@@ -417,10 +524,16 @@ export const SearchResultsPage: React.FC = () => {
                         (selectedFlight) => selectedFlight.id === flight.id,
                       )}
                       isComparisonSelectionDisabled={
-                        selectedFlights.length >= maxComparisonFlights
+                        (selectedFlights.length >= maxComparisonFlights &&
+                          !selectedFlights.some((item) => item.id === flight.id)) ||
+                        (selectedFlights.length === 1 &&
+                          (selectedFlights[0].originIata.toLowerCase() !== flight.originIata.toLowerCase() ||
+                            selectedFlights[0].destinationIata.toLowerCase() !== flight.destinationIata.toLowerCase()))
                       }
+                      isSavedToTrips={savedTripIds.has(flight.id)}
                       onComparisonToggle={handleComparisonToggle}
                       onViewDetailsClick={handleFlightDetailsClick}
+                      onSaveTripClick={handleSaveFlightToTrips}
                     />
                   ))
                 )}
@@ -480,6 +593,23 @@ export const SearchResultsPage: React.FC = () => {
         onClear={handleClearComparisonSelection}
         onCompare={handleCompareSelectedFlights}
       />
+
+      {/* Notificaciones y validaciones de usuario */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          variant="filled"
+          sx={{ width: '100%', borderRadius: 2, fontWeight: 600, boxShadow: 4 }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

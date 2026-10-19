@@ -8,6 +8,7 @@ import {
   Paper,
   InputAdornment,
   Grid,
+  Chip,
 } from '@mui/material';
 
 export interface FlightTrackerSearchProps {
@@ -17,26 +18,39 @@ export interface FlightTrackerSearchProps {
   isLoading?: boolean;
 }
 
+const QUICK_FLIGHTS = [
+  { code: 'LA2010', label: 'LA2010 (Embarcando)', desc: 'Lima ➔ Cusco' },
+  { code: 'LA2040', label: 'LA2040 (Programado)', desc: 'Lima ➔ Cusco' },
+  { code: 'LA2501', label: 'LA2501 (1 Escala)', desc: 'Arequipa ➔ Iquitos' },
+  { code: 'JA3002', label: 'JA3002 (Demorado)', desc: 'Lima ➔ Iquitos' },
+];
+
 export const FlightTrackerSearch: React.FC<FlightTrackerSearchProps> = ({
-  initialFlightNumber = 'LA 2045',
-  initialDate = '15 Sep 2025',
+  initialFlightNumber = 'LA2010',
+  initialDate = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }),
   onSearch,
   isLoading = false,
 }) => {
   const [flightNumber, setFlightNumber] = useState(initialFlightNumber);
   const [date, setDate] = useState(initialDate);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) {
-      onSearch(flightNumber, date);
+  const handleSubmit = (e?: React.FormEvent, customFlight?: string) => {
+    if (e) e.preventDefault();
+    const targetFlight = customFlight || flightNumber;
+    if (onSearch && targetFlight.trim()) {
+      onSearch(targetFlight.trim(), date);
     }
+  };
+
+  const handleChipClick = (code: string) => {
+    setFlightNumber(code);
+    handleSubmit(undefined, code);
   };
 
   return (
     <Paper
       component="form"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => handleSubmit(e)}
       elevation={0}
       sx={{
         width: '100%',
@@ -59,7 +73,7 @@ export const FlightTrackerSearch: React.FC<FlightTrackerSearchProps> = ({
               fullWidth
               value={flightNumber}
               onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-              placeholder="Ej. LA 2045, H2 5110"
+              placeholder="Ej. LA2010, LA2040, LA2501"
               size="medium"
               InputProps={{
                 startAdornment: (
@@ -137,6 +151,27 @@ export const FlightTrackerSearch: React.FC<FlightTrackerSearchProps> = ({
           >
             Rastrear vuelo
           </Button>
+        </Grid>
+
+        {/* Sugerencias Rápidas de Vuelos Reales en Supabase */}
+        <Grid item xs={12}>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 1 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              Vuelos en vivo:
+            </Typography>
+            {QUICK_FLIGHTS.map((item) => (
+              <Chip
+                key={item.code}
+                label={item.label}
+                size="small"
+                variant={flightNumber === item.code ? 'filled' : 'outlined'}
+                color={flightNumber === item.code ? 'primary' : 'default'}
+                onClick={() => handleChipClick(item.code)}
+                clickable
+                sx={{ fontSize: '0.75rem', fontWeight: 600 }}
+              />
+            ))}
+          </Stack>
         </Grid>
       </Grid>
     </Paper>
