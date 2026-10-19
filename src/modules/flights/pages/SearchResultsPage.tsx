@@ -19,7 +19,7 @@ import { SearchSummaryBar } from '../components/SearchSummaryBar';
 import FilterSidebar from '../components/FilterSidebar';
 import FlightCard from '../components/FlightCard';
 import ComparisonSelectionBar from '../components/ComparisonSelectionBar';
-import { flightService } from '../../../services/flightService';
+import { flightService, applyFiltersAndSort } from '../../../services/flightService';
 import { tripService } from '../../../services/tripService';
 import { authService } from '../../../services/authService';
 import {
@@ -35,13 +35,14 @@ export const SearchResultsPage: React.FC = () => {
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const [searchParams, setSearchParams] = useState<SearchQueryParams | undefined>(undefined);
   const [isSearchPersisted, setIsSearchPersisted] = useState<boolean>(false);
+  const [rawFlights, setRawFlights] = useState<FlightItem[]>([]);
   const [flights, setFlights] = useState<FlightItem[]>([]);
   const [selectedFlights, setSelectedFlights] = useState<FlightItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<SortOption>('PRICE_ASC');
   const [filters, setFilters] = useState<FlightFilterState>({
     stops: [],
-    priceRange: [80, 500],
+    priceRange: [0, 500],
     airlines: [],
     departureTimes: [],
   });
@@ -80,6 +81,7 @@ export const SearchResultsPage: React.FC = () => {
     };
   }, [urlSearchParams]);
 
+  // 1. Cargar vuelos base de la ruta desde el backend o persistencia
   useEffect(() => {
     let isMounted = true;
 
@@ -87,11 +89,11 @@ export const SearchResultsPage: React.FC = () => {
       try {
         setIsLoading(true);
         const params = await flightService.getCurrentSearchParams();
-        const results = await flightService.searchFlights(params, filters, sortBy);
+        const results = await flightService.searchFlights(params, undefined, 'PRICE_ASC');
 
         if (isMounted) {
           setSearchParams(params);
-          setFlights(results);
+          setRawFlights(results);
           setIsSearchPersisted(flightService.hasPersistedSearch());
         }
       } catch (error) {
@@ -108,7 +110,13 @@ export const SearchResultsPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [filters, sortBy]);
+  }, []);
+
+  // 2. Filtrado y ordenamiento reactivo e instantáneo en cliente
+  useEffect(() => {
+    const filtered = applyFiltersAndSort(rawFlights, filters, sortBy);
+    setFlights(filtered);
+  }, [rawFlights, filters, sortBy]);
 
   // Sincronizar vuelos guardados de Mis Viajes desde Supabase
   useEffect(() => {
@@ -183,7 +191,7 @@ export const SearchResultsPage: React.FC = () => {
   const handleResetFilters = () => {
     setFilters({
       stops: [],
-      priceRange: [80, 500],
+      priceRange: [0, 500],
       airlines: [],
       departureTimes: [],
     });
@@ -336,6 +344,7 @@ export const SearchResultsPage: React.FC = () => {
               <FilterSidebar
                 initialFilters={filters}
                 onFiltersChange={handleFiltersChange}
+                availableFlights={rawFlights}
               />
             </Grid>
 
@@ -574,6 +583,7 @@ export const SearchResultsPage: React.FC = () => {
           <FilterSidebar
             initialFilters={filters}
             onFiltersChange={handleFiltersChange}
+            availableFlights={rawFlights}
           />
         </Box>
         <Button

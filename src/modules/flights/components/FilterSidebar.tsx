@@ -11,20 +11,24 @@ import {
   Slider,
   Paper,
 } from '@mui/material';
-import { FlightFilterState, TimeOfDay } from '../../../types/flight.types';
+import { FlightFilterState, FlightItem, TimeOfDay } from '../../../types/flight.types';
 
 export interface FilterSidebarProps {
   onFiltersChange?: (filters: FlightFilterState) => void;
   initialFilters?: Partial<FlightFilterState>;
+  availableFlights?: FlightItem[];
+  currencySymbol?: string;
 }
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onFiltersChange,
   initialFilters,
+  availableFlights = [],
+  currencySymbol = '$',
 }) => {
   const [stops, setStops] = useState<number[]>(initialFilters?.stops ?? []);
   const [priceRange, setPriceRange] = useState<[number, number]>(
-    initialFilters?.priceRange ?? [80, 500]
+    initialFilters?.priceRange ?? [0, 500]
   );
   const [airlines, setAirlines] = useState<string[]>(
     initialFilters?.airlines ?? []
@@ -84,7 +88,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   const handleResetFilters = () => {
     const defaultStops: number[] = [];
-    const defaultRange: [number, number] = [80, 500];
+    const defaultRange: [number, number] = [0, 500];
     const defaultAirlines: string[] = [];
     const defaultTimes: TimeOfDay[] = [];
 
@@ -100,6 +104,55 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       departureTimes: defaultTimes,
     });
   };
+
+  // Helper para calcular precio mínimo según escalas
+  const getMinPriceForStops = (stopVal: number): string | null => {
+    if (!availableFlights || availableFlights.length === 0) return null;
+    const matching = availableFlights.filter((f) =>
+      stopVal >= 2 ? f.stopsCount >= 2 : f.stopsCount === stopVal
+    );
+    if (matching.length === 0) return null;
+    const min = Math.min(...matching.map((f) => f.price));
+    return `desde ${currencySymbol} ${min % 1 === 0 ? min : min.toFixed(2)}`;
+  };
+
+  // Helper para calcular precio mínimo según aerolínea
+  const getMinPriceForAirline = (airlineName: string): string | null => {
+    if (!availableFlights || availableFlights.length === 0) return null;
+    const sel = airlineName.toLowerCase();
+    const matching = availableFlights.filter(
+      (f) =>
+        f.airline.name.toLowerCase().includes(sel) ||
+        sel.includes(f.airline.name.toLowerCase()) ||
+        (f.airline.code && sel.includes(f.airline.code.toLowerCase()))
+    );
+    if (matching.length === 0) return null;
+    const min = Math.min(...matching.map((f) => f.price));
+    return `desde ${currencySymbol} ${min % 1 === 0 ? min : min.toFixed(2)}`;
+  };
+
+  // Opciones de aerolíneas disponibles
+  const airlineOptions = React.useMemo(() => {
+    if (availableFlights && availableFlights.length > 0) {
+      const map = new Map<string, string>();
+      availableFlights.forEach((f) => {
+        if (f.airline?.name && !map.has(f.airline.name)) {
+          map.set(f.airline.name, f.airline.name);
+        }
+      });
+      if (map.size > 0) {
+        return Array.from(map.values()).map((name) => ({
+          name,
+          price: getMinPriceForAirline(name),
+        }));
+      }
+    }
+    return [
+      { name: 'LATAM Airlines', price: getMinPriceForAirline('LATAM') },
+      { name: 'Sky Airline', price: getMinPriceForAirline('Sky') },
+      { name: 'JetSMART Perú', price: getMinPriceForAirline('JetSMART') },
+    ];
+  }, [availableFlights, currencySymbol]);
 
   return (
     <Paper
@@ -145,9 +198,9 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </Typography>
           <FormGroup>
             {[
-              { label: 'Directo', val: 0, price: 'S/. 120' },
-              { label: '1 escala', val: 1, price: 'S/. 180' },
-              { label: '2+ escalas', val: 2, price: 'S/. 250' },
+              { label: 'Directo', val: 0, price: getMinPriceForStops(0) },
+              { label: '1 escala', val: 1, price: getMinPriceForStops(1) },
+              { label: '2+ escalas', val: 2, price: getMinPriceForStops(2) },
             ].map((item) => (
               <Box
                 key={`stop-${item.val}`}
@@ -175,9 +228,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   }
                   sx={{ mr: 0 }}
                 />
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                  {item.price}
-                </Typography>
+                {item.price && (
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                    {item.price}
+                  </Typography>
+                )}
               </Box>
             ))}
           </FormGroup>
@@ -185,10 +240,10 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         <Divider />
 
-        {/* 2. Filtro de Precio Máximo */}
+        {/* 2. Filtro de Rango de Precio */}
         <Stack spacing={1.5}>
           <Typography variant="subtitle2" sx={{ color: 'secondary.main', fontWeight: 700, fontSize: '0.875rem' }}>
-            Precio máximo
+            Rango de precio
           </Typography>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -196,7 +251,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               Rango:
             </Typography>
             <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 700, fontSize: '0.8125rem' }}>
-              S/. {priceRange[0]} – S/. {priceRange[1]}
+              {currencySymbol} {priceRange[0]} – {currencySymbol} {priceRange[1]}
             </Typography>
           </Stack>
 
@@ -205,7 +260,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               value={priceRange}
               onChange={handlePriceChange}
               valueLabelDisplay="auto"
-              min={80}
+              min={0}
               max={500}
               step={10}
               color="primary"
@@ -235,12 +290,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             Aerolíneas
           </Typography>
           <FormGroup>
-            {[
-              { name: 'LATAM', price: 'S/. 145' },
-              { name: 'Sky Airline', price: 'S/. 120' },
-              { name: 'JetSMART', price: 'S/. 135' },
-              { name: 'Star Perú', price: 'S/. 160' },
-            ].map((airline) => (
+            {airlineOptions.map((airline) => (
               <Box
                 key={airline.name}
                 sx={{
@@ -267,9 +317,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   }
                   sx={{ mr: 0 }}
                 />
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                  {airline.price}
-                </Typography>
+                {airline.price && (
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                    {airline.price}
+                  </Typography>
+                )}
               </Box>
             ))}
           </FormGroup>

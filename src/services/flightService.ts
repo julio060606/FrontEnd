@@ -192,15 +192,8 @@ export const flightService = {
       });
 
       if (Array.isArray(response.data)) {
-        let results = response.data.map(mapDtoToFlightItem);
-
-        // Aplicar ordenamiento
-        if (sortBy === 'PRICE_ASC') {
-          results.sort((a, b) => a.price - b.price);
-        } else if (sortBy === 'DURATION_ASC') {
-          results.sort((a, b) => a.durationMinutes - b.durationMinutes);
-        }
-        return results;
+        const rawResults = response.data.map(mapDtoToFlightItem);
+        return applyFiltersAndSort(rawResults, filters, sortBy);
       }
     } catch (error) {
       console.warn('Backend Spring Boot /flights/search no respondió o offline:', error);
@@ -218,39 +211,69 @@ export const flightService = {
       results = results.filter((f) => f.destinationIata.toLowerCase() === params.destinationIata!.toLowerCase());
     }
 
-    if (filters) {
-      if (filters.stops && filters.stops.length > 0) {
-        results = results.filter((f) => filters.stops!.includes(f.stopsCount));
-      }
-      if (filters.priceRange) {
-        const [min, max] = filters.priceRange;
-        results = results.filter((f) => f.price >= min && f.price <= max);
-      }
-      if (filters.airlines && filters.airlines.length > 0) {
-        results = results.filter((f) =>
-          filters.airlines!.some((selectedAirline) =>
-            f.airline.name.toLowerCase().includes(selectedAirline.toLowerCase()) ||
-            selectedAirline.toLowerCase().includes(f.airline.name.toLowerCase())
-          )
-        );
-      }
-      if (filters.departureTimes && filters.departureTimes.length > 0) {
-        results = results.filter((f) => filters.departureTimes!.includes(f.timeOfDay));
-      }
-    }
-
-    if (sortBy === 'PRICE_ASC') {
-      results.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'DURATION_ASC') {
-      results.sort((a, b) => a.durationMinutes - b.durationMinutes);
-    } else if (sortBy === 'BEST') {
-      results.sort((a, b) => {
-        const scoreA = a.price * 0.6 + a.durationMinutes * 0.3 + a.stopsCount * 50;
-        const scoreB = b.price * 0.6 + b.durationMinutes * 0.3 + b.stopsCount * 50;
-        return scoreA - scoreB;
-      });
-    }
-
-    return simulateDelay(results, 150);
+    const filteredMocks = applyFiltersAndSort(results, filters, sortBy);
+    return simulateDelay(filteredMocks, 150);
   },
+};
+
+/**
+ * Función unificada para aplicar filtros de escalas, precios, aerolíneas, horarios y ordenamiento.
+ */
+export const applyFiltersAndSort = (
+  flights: FlightItem[],
+  filters?: Partial<FlightFilterState>,
+  sortBy: SortOption = 'PRICE_ASC'
+): FlightItem[] => {
+  let results = [...flights];
+
+  if (filters) {
+    // 1. Escalas: 0 = directo, 1 = 1 escala, 2 = 2 o más escalas
+    if (filters.stops && filters.stops.length > 0) {
+      results = results.filter((f) =>
+        filters.stops!.some((s) => (s >= 2 ? f.stopsCount >= 2 : f.stopsCount === s))
+      );
+    }
+
+    // 2. Rango de precio: [min, max]
+    if (filters.priceRange && filters.priceRange.length === 2) {
+      const [min, max] = filters.priceRange;
+      results = results.filter((f) => f.price >= min && f.price <= max);
+    }
+
+    // 3. Aerolíneas seleccionadas
+    if (filters.airlines && filters.airlines.length > 0) {
+      results = results.filter((f) =>
+        filters.airlines!.some((selectedAirline) => {
+          const selected = selectedAirline.trim().toLowerCase();
+          const flightAirline = f.airline.name.trim().toLowerCase();
+          const flightCode = (f.airline.code || f.airline.iataCode || '').trim().toLowerCase();
+          return (
+            flightAirline.includes(selected) ||
+            selected.includes(flightAirline) ||
+            (flightCode && selected.includes(flightCode))
+          );
+        })
+      );
+    }
+
+    // 4. Horarios de salida (Mañana, Tarde, Noche)
+    if (filters.departureTimes && filters.departureTimes.length > 0) {
+      results = results.filter((f) => filters.departureTimes!.includes(f.timeOfDay));
+    }
+  }
+
+  // 5. Criterios de ordenamiento
+  if (sortBy === 'PRICE_ASC') {
+    results.sort((a, b) => a.price - b.price);
+  } else if (sortBy === 'DURATION_ASC') {
+    results.sort((a, b) => a.durationMinutes - b.durationMinutes);
+  } else if (sortBy === 'BEST') {
+    results.sort((a, b) => {
+      const scoreA = a.price * 0.6 + a.durationMinutes * 0.3 + a.stopsCount * 50;
+      const scoreB = b.price * 0.6 + b.durationMinutes * 0.3 + b.stopsCount * 50;
+      return scoreA - scoreB;
+    });
+  }
+
+  return results;
 };
