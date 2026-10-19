@@ -102,7 +102,16 @@ export const flightService = {
   },
 
   /**
-   * Busca y filtra vuelos según los criterios del usuario
+   * Busca y filtra vuelos segun los criterios seleccionados por el usuario.
+   *
+   * En modo mock (USE_MOCKS = true), aplica los filtros multicriterio en memoria y simula latencia de red.
+   * En modo produccion (USE_MOCKS = false), se conecta al endpoint REST de Spring Boot en:
+   * GET /api/v1/flights/search
+   *
+   * @param params - Parametros de ruta y fechas (origen IATA, destino IATA, departureDate, returnDate, pasajeros, clase).
+   * @param filters - Filtros secundarios aplicados en la barra lateral (escalas, rango de precios, aerolineas, horarios).
+   * @param sortBy - Criterio de ordenamiento ('PRICE_ASC', 'DURATION_ASC', 'BEST'). Por defecto 'PRICE_ASC'.
+   * @returns Promesa que resuelve el arreglo de vuelos coincidentes (FlightItem[]).
    */
   async searchFlights(
     params?: Partial<SearchQueryParams>,
