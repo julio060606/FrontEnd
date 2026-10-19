@@ -12,22 +12,28 @@ import {
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { FlightItem } from '../../../types/flight.types';
 
 export interface FlightCardProps {
   flight: FlightItem;
   isSelectedForComparison?: boolean;
   isComparisonSelectionDisabled?: boolean;
+  isSavedToTrips?: boolean;
   onComparisonToggle?: (flight: FlightItem) => void;
   onViewDetailsClick?: (flight: FlightItem) => void;
+  onSaveTripClick?: (flight: FlightItem) => void;
 }
 
 export const FlightCard: React.FC<FlightCardProps> = ({
   flight,
   isSelectedForComparison = false,
   isComparisonSelectionDisabled = false,
+  isSavedToTrips = false,
   onComparisonToggle,
   onViewDetailsClick,
+  onSaveTripClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -294,6 +300,25 @@ export const FlightCard: React.FC<FlightCardProps> = ({
                 sx={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}
               >
                 Ver detalles
+              </Button>
+
+              <Button
+                variant="text"
+                color={isSavedToTrips ? 'success' : 'inherit'}
+                startIcon={isSavedToTrips ? <BookmarkIcon sx={{ fontSize: '1rem !important' }} /> : <BookmarkBorderIcon sx={{ fontSize: '1rem !important' }} />}
+                onClick={() => onSaveTripClick?.(flight)}
+                sx={{
+                  fontSize: '0.75rem',
+                  fontWeight: isSavedToTrips ? 700 : 500,
+                  color: isSavedToTrips ? 'success.dark' : 'text.secondary',
+                  whiteSpace: 'nowrap',
+                  py: 0.25,
+                  '&:hover': {
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                {isSavedToTrips ? 'Guardado' : 'Guardar viaje'}
               </Button>
             </Stack>
           </Stack>

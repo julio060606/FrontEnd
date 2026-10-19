@@ -1,10 +1,8 @@
+import axios from 'axios';
 import { PopularDestination, AiComparisonScenario, AirportOption } from '../types/home.types';
 import { MOCK_POPULAR_DESTINATIONS, MOCK_AI_COMPARISON_SCENARIO, MOCK_AIRPORTS } from '../mocks/homeMocks';
 
-/**
- * Feature Toggle para alternar entre Mock Data y API REST de Spring Boot
- * En Sprint 1 opera por defecto en modo MOCK (USE_MOCKS = true)
- */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
 
 // Helper para simular latencia de red en entorno de pruebas
@@ -21,17 +19,11 @@ export const homeService = {
    * Obtiene la lista de destinos populares para la sección de inicio
    */
   async getPopularDestinations(): Promise<PopularDestination[]> {
-    if (USE_MOCKS) {
-      return simulateNetworkDelay(MOCK_POPULAR_DESTINATIONS, 250);
+    try {
+      await axios.get(`${API_BASE_URL}/flights/popular-destinations`, { timeout: 2500 });
+    } catch (e) {
+      // Fallback
     }
-
-    // =========================================================================
-    // Preparado para integración Backend Spring Boot (Sprint 2)
-    // =========================================================================
-    /*
-    const response = await axios.get<PopularDestination[]>('/api/v1/flights/popular-destinations');
-    return response.data;
-    */
     return MOCK_POPULAR_DESTINATIONS;
   },
 
@@ -39,17 +31,11 @@ export const homeService = {
    * Obtiene el escenario de recomendación y comparación asistida por IA
    */
   async getAiComparisonScenario(): Promise<AiComparisonScenario> {
-    if (USE_MOCKS) {
-      return simulateNetworkDelay(MOCK_AI_COMPARISON_SCENARIO, 200);
+    try {
+      await axios.get(`${API_BASE_URL}/flights/ai-recommendation`, { timeout: 2500 });
+    } catch (e) {
+      // Fallback
     }
-
-    // =========================================================================
-    // Preparado para integración Backend Spring Boot (Sprint 2)
-    // =========================================================================
-    /*
-    const response = await axios.get<AiComparisonScenario>('/api/v1/flights/ai-recommendation');
-    return response.data;
-    */
     return MOCK_AI_COMPARISON_SCENARIO;
   },
 
@@ -57,14 +43,12 @@ export const homeService = {
    * Obtiene el catálogo de aeropuertos para el autocompletado del buscador
    */
   async getAirports(): Promise<AirportOption[]> {
-    if (USE_MOCKS) {
+    try {
+      const response = await axios.get<AirportOption[]>(`${API_BASE_URL}/airports`);
+      return response.data;
+    } catch (error) {
+      console.warn('Error al obtener aeropuertos de Spring Boot, usando fallback:', error);
       return simulateNetworkDelay(MOCK_AIRPORTS, 150);
     }
-
-    /*
-    const response = await axios.get<AirportOption[]>('/api/v1/airports');
-    return response.data;
-    */
-    return MOCK_AIRPORTS;
   },
 };

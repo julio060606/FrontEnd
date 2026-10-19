@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   AIRecommendation,
   CompareFlightCardData,
@@ -8,6 +9,8 @@ import {
 } from '../types/compare.types';
 import { FlightItem } from '../types/flight.types';
 import { flightService } from './flightService';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 type RecommendationMetric =
   | 'price'
@@ -626,6 +629,12 @@ export const compareService = {
         'INVALID_SELECTION',
         'Selecciona dos vuelos diferentes para iniciar la comparación.',
       );
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}/flights/compare`, [flightIdA, flightIdB], { timeout: 3000 });
+    } catch (e) {
+      console.warn('Backend compare endpoint no disponible, procesando cliente:', e);
     }
 
     const [flightA, flightB] = await flightService.getFlightsByIds([flightIdA, flightIdB]);
