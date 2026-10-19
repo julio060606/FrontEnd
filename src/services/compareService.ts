@@ -632,7 +632,7 @@ export const compareService = {
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/flights/compare`, [flightIdA, flightIdB], { timeout: 3000 });
+      await axios.post(`${API_BASE_URL}/flights/compare`, [flightIdA, flightIdB], { timeout: 45000 });
     } catch (e) {
       console.warn('Backend compare endpoint no disponible, procesando cliente:', e);
     }

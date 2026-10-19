@@ -11,7 +11,7 @@ export const flightDetailService = {
   async getFlightDetailById(flightId: string): Promise<FlightDetail> {
     try {
       const response = await axios.get<any>(`${API_BASE_URL}/flights/${flightId}`, {
-        timeout: 4000,
+        timeout: 45000,
       });
 
       const f = response.data;
@@ -43,7 +43,7 @@ export const flightDetailService = {
               origin: f.origin?.iataCode,
               destination: f.destination?.iataCode,
             },
-            timeout: 2500,
+            timeout: 45000,
           });
 
           if (Array.isArray(altRes.data)) {

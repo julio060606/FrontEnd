@@ -138,7 +138,7 @@ export const flightService = {
   async getFlightsByIds(flightIds: string[]): Promise<FlightItem[]> {
     try {
       const promises = flightIds.map((id) =>
-        axios.get(`${API_BASE_URL}/flights/${id}`, { timeout: 2500 })
+        axios.get(`${API_BASE_URL}/flights/${id}`, { timeout: 45000 })
       );
       const responses = await Promise.allSettled(promises);
       const backendFlights = responses
@@ -188,7 +188,7 @@ export const flightService = {
           departureDate: departureDateParam,
           maxPrice: filters?.priceRange ? filters.priceRange[1] : undefined,
         },
-        timeout: 4000,
+        timeout: 45000,
       });
 
       if (Array.isArray(response.data)) {
@@ -203,7 +203,10 @@ export const flightService = {
         return results;
       }
     } catch (error) {
-      console.warn('Backend Spring Boot /flights/search no respondió o offline, usando respaldo:', error);
+      console.warn('Backend Spring Boot /flights/search no respondió o offline:', error);
+      if (!USE_MOCKS) {
+        return [];
+      }
     }
 
     // 2. Respaldo local SOLO si la petición HTTP falló por desconexión del backend

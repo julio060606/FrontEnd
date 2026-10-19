@@ -33,7 +33,7 @@ export const trackerService = {
 
     try {
       const response = await axios.get<any>(`${API_BASE_URL}/flight-status/track/${cleanFlightNumber}`, {
-        timeout: 4000,
+        timeout: 45000,
       });
       const f = response.data;
 

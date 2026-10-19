@@ -20,7 +20,7 @@ export const homeService = {
    */
   async getPopularDestinations(): Promise<PopularDestination[]> {
     try {
-      await axios.get(`${API_BASE_URL}/flights/popular-destinations`, { timeout: 2500 });
+      await axios.get(`${API_BASE_URL}/flights/popular-destinations`, { timeout: 45000 });
     } catch (e) {
       // Fallback
     }
@@ -32,7 +32,7 @@ export const homeService = {
    */
   async getAiComparisonScenario(): Promise<AiComparisonScenario> {
     try {
-      await axios.get(`${API_BASE_URL}/flights/ai-recommendation`, { timeout: 2500 });
+      await axios.get(`${API_BASE_URL}/flights/ai-recommendation`, { timeout: 45000 });
     } catch (e) {
       // Fallback
     }
@@ -44,7 +44,7 @@ export const homeService = {
    */
   async getAirports(): Promise<AirportOption[]> {
     try {
-      const response = await axios.get<AirportOption[]>(`${API_BASE_URL}/airports`);
+      const response = await axios.get<AirportOption[]>(`${API_BASE_URL}/airports`, { timeout: 45000 });
       return response.data;
     } catch (error) {
       console.warn('Error al obtener aeropuertos de Spring Boot, usando fallback:', error);

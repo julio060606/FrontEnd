@@ -52,7 +52,7 @@ export const tripService = {
     try {
       const response = await axios.get<UserTrip[]>(`${API_BASE_URL}/trips`, {
         headers: { Authorization: `Bearer ${token}` },
-        timeout: 4000,
+        timeout: 45000,
       });
       return response.data || [];
     } catch (error) {
@@ -81,7 +81,7 @@ export const tripService = {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      timeout: 4000,
+      timeout: 45000,
     });
 
     window.dispatchEvent(new CustomEvent('chasquifly:trips-change'));
@@ -97,7 +97,7 @@ export const tripService = {
 
     await axios.delete(`${API_BASE_URL}/trips/${tripId}`, {
       headers: { Authorization: `Bearer ${token}` },
-      timeout: 4000,
+      timeout: 45000,
     });
 
     window.dispatchEvent(new CustomEvent('chasquifly:trips-change'));
