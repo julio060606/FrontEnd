@@ -1,3 +1,8 @@
+/**
+ * Suite de pruebas unitarias para compareService (5 pruebas).
+ * Verifica validación de selección, existencia en catálogo, especificaciones técnicas,
+ * motor de recomendación por prioridad y reglas de compatibilidad entre vuelos.
+ */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MOCK_FLIGHT_RESULTS } from '../mocks/flightsMocks';
 import { ComparisonPriority } from '../types/compare.types';
@@ -20,14 +25,18 @@ describe('compareService', () => {
     vi.restoreAllMocks();
   });
 
-  it.each([
-    [undefined, 'fl-002'],
-    ['fl-001', undefined],
-    ['fl-001', 'fl-001'],
-  ])('rechaza una selección incompleta o duplicada', async (flightIdA, flightIdB) => {
-    await expect(compareService.getFlightComparison(flightIdA, flightIdB)).rejects.toMatchObject({
-      code: 'INVALID_SELECTION',
-    });
+  it('rechaza una selección incompleta o duplicada', async () => {
+    const invalidPairs: Array<[string | undefined, string | undefined]> = [
+      [undefined, 'fl-002'],
+      ['fl-001', undefined],
+      ['fl-001', 'fl-001'],
+    ];
+
+    for (const [flightIdA, flightIdB] of invalidPairs) {
+      await expect(compareService.getFlightComparison(flightIdA, flightIdB)).rejects.toMatchObject({
+        code: 'INVALID_SELECTION',
+      });
+    }
   });
 
   it('rechaza identificadores que ya no existen en el catálogo', async () => {
@@ -102,18 +111,22 @@ describe('compareService', () => {
     });
   });
 
-  it.each([
-    ['DIFFERENT_ROUTE', { originIata: 'AQP' }],
-    ['DIFFERENT_DATE', { departureDate: '2026-09-16' }],
-    ['DIFFERENT_CURRENCY', { currency: 'USD' }],
-    ['DIFFERENT_CABIN_CLASS', { cabinClass: 'Ejecutiva' }],
-  ] as const)('rechaza vuelos incompatibles: %s', async (expectedCode, changes) => {
-    const flightA = getMockFlight('fl-001');
-    const flightB: FlightItem = { ...getMockFlight('fl-003'), ...changes };
-    vi.spyOn(flightService, 'getFlightsByIds').mockResolvedValue([flightA, flightB]);
+  it('rechaza vuelos incompatibles por ruta, fecha, moneda o cabina', async () => {
+    const incompatibleCases: Array<[string, Partial<FlightItem>]> = [
+      ['DIFFERENT_ROUTE', { originIata: 'AQP' }],
+      ['DIFFERENT_DATE', { departureDate: '2026-09-16' }],
+      ['DIFFERENT_CURRENCY', { currency: 'USD' }],
+      ['DIFFERENT_CABIN_CLASS', { cabinClass: 'Ejecutiva' }],
+    ];
 
-    await expect(
-      compareService.getFlightComparison(flightA.id, flightB.id),
-    ).rejects.toMatchObject({ code: expectedCode });
+    for (const [expectedCode, changes] of incompatibleCases) {
+      const flightA = getMockFlight('fl-001');
+      const flightB: FlightItem = { ...getMockFlight('fl-003'), ...changes };
+      vi.spyOn(flightService, 'getFlightsByIds').mockResolvedValueOnce([flightA, flightB]);
+
+      await expect(
+        compareService.getFlightComparison(flightA.id, flightB.id),
+      ).rejects.toMatchObject({ code: expectedCode });
+    }
   });
 });

@@ -1,3 +1,7 @@
+/**
+ * Suite de pruebas unitarias para localStorageService (4 pruebas).
+ * Verifica lectura/escritura tipada con Zod, eliminación, sanitización de JSON corrupto y fallback seguro.
+ */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import { localStorageService } from './localStorageService';
