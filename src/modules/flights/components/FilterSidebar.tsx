@@ -131,6 +131,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     return `desde ${currencySymbol} ${min % 1 === 0 ? min : min.toFixed(2)}`;
   };
 
+  // Helper para calcular precio mínimo según horario de salida
+  const getMinPriceForTimeOfDay = (timeVal: TimeOfDay): string | null => {
+    if (!availableFlights || availableFlights.length === 0) return null;
+    const matching = availableFlights.filter((f) => f.timeOfDay === timeVal);
+    if (matching.length === 0) return null;
+    const min = Math.min(...matching.map((f) => f.price));
+    return `desde ${currencySymbol} ${min % 1 === 0 ? min : min.toFixed(2)}`;
+  };
+
   // Opciones de aerolíneas disponibles
   const airlineOptions = React.useMemo(() => {
     if (availableFlights && availableFlights.length > 0) {
@@ -251,7 +260,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               Rango:
             </Typography>
             <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 700, fontSize: '0.8125rem' }}>
-              {currencySymbol} {priceRange[0]} – {currencySymbol} {priceRange[1]}
+              {currencySymbol} {priceRange[0]} – {currencySymbol} {priceRange[1]} USD
             </Typography>
           </Stack>
 
@@ -336,28 +345,42 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </Typography>
           <FormGroup>
             {[
-              { label: 'Mañana (05:00 - 12:00)', val: 'MORNING' as TimeOfDay },
-              { label: 'Tarde (12:00 - 18:00)', val: 'AFTERNOON' as TimeOfDay },
-              { label: 'Noche (18:00 - 24:00)', val: 'NIGHT' as TimeOfDay },
+              { label: 'Mañana (05:00 - 12:00)', val: 'MORNING' as TimeOfDay, price: getMinPriceForTimeOfDay('MORNING') },
+              { label: 'Tarde (12:00 - 18:00)', val: 'AFTERNOON' as TimeOfDay, price: getMinPriceForTimeOfDay('AFTERNOON') },
+              { label: 'Noche (18:00 - 24:00)', val: 'NIGHT' as TimeOfDay, price: getMinPriceForTimeOfDay('NIGHT') },
             ].map((timeOption) => (
-              <FormControlLabel
+              <Box
                 key={timeOption.val}
-                control={
-                  <Checkbox
-                    checked={departureTimes.includes(timeOption.val)}
-                    onChange={() => handleTimeToggle(timeOption.val)}
-                    color="primary"
-                    size="small"
-                    sx={{ p: 0.5 }}
-                  />
-                }
-                label={
-                  <Typography variant="body2" sx={{ color: 'secondary.main', fontSize: '0.8125rem' }}>
-                    {timeOption.label}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  py: 0.25,
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={departureTimes.includes(timeOption.val)}
+                      onChange={() => handleTimeToggle(timeOption.val)}
+                      color="primary"
+                      size="small"
+                      sx={{ p: 0.5 }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" sx={{ color: 'secondary.main', fontSize: '0.8125rem' }}>
+                      {timeOption.label}
+                    </Typography>
+                  }
+                  sx={{ mr: 0 }}
+                />
+                {timeOption.price && (
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                    {timeOption.price}
                   </Typography>
-                }
-                sx={{ mr: 0, py: 0.25 }}
-              />
+                )}
+              </Box>
             ))}
           </FormGroup>
         </Stack>
