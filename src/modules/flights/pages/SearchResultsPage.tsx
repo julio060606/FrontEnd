@@ -35,6 +35,7 @@ export const SearchResultsPage: React.FC = () => {
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const [searchParams, setSearchParams] = useState<SearchQueryParams | undefined>(undefined);
   const [isSearchPersisted, setIsSearchPersisted] = useState<boolean>(false);
+  // EC-111 [S3-05.4]: rawFlights almacena el catálogo base obtenido de la API para garantizar 0 ms de latencia al aplicar filtros reactivos
   const [rawFlights, setRawFlights] = useState<FlightItem[]>([]);
   const [flights, setFlights] = useState<FlightItem[]>([]);
   const [selectedFlights, setSelectedFlights] = useState<FlightItem[]>([]);
