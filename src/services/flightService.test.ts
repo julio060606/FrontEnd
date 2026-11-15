@@ -1,3 +1,7 @@
+/**
+ * Suite de pruebas unitarias para flightService y applyFiltersAndSort (9 pruebas).
+ * Verifica la hidratación/persistencia de búsqueda y el pipeline reactivo de filtros y ordenamiento.
+ */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MOCK_CURRENT_SEARCH } from '../mocks/flightsMocks';
 import { SearchQueryParams } from '../types/flight.types';
